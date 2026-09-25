@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
+  <title>Sơ Đồ Phả Chi Phạm Văn - Tiền Phong Thượng Thôn</title>
+  <style>
+    :root {
+      --primary: #8b1c1c;
+      --primary-dark: #631212;
+      --gold: #c59b27;
+      --bg: #f5f4ef;
+      --card-bg: #ffffff;
+      --text: #2d3748;
+      --line: #b0bec5;
+      --highlight: #fffae6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; text-align: center; }
+
+    /* Header */
+    header { background: #fff; padding: 18px 12px; border-bottom: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.03); margin-bottom: 15px; }
+    header h1 { color: var(--primary); font-size: 20px; text-transform: uppercase; margin-bottom: 4px; }
+    header p { color: #666; font-size: 13px; }
+
+    /* Thanh điều khiển trên di động: Chuyển chế độ xem */
+    .view-switcher {
+      display: inline-flex;
+      background: #edf2f7;
+      padding: 4px;
+      border-radius: 25px;
+      margin-top: 10px;
+    }
+    .view-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a5568;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .view-btn.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 5px rgba(139, 28, 28, 0.3);
+    }
+
+    /* Khung Tìm Kiếm & Bộ Lọc */
+    .search-section {
+      max-width: 600px;
+      margin: 0 auto 16px auto;
+      padding: 0 12px;
+      position: relative;
+    }
+    .search-box-wrap {
+      display: flex;
+      gap: 6px;
+      background: #fff;
+      padding: 6px 8px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e0;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+    }
+    .search-box-wrap:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(139, 28, 28, 0.15);
+    }
+    #genFilter {
+      border: none;
+      background: #f7fafc;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      padding: 6px 8px;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+      border: 1px solid #e2e8f0;
+      max-width: 120px;
+    }
+    #searchInput {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      padding: 6px 8px;
+      color: #333;
+    }
+    /* Menu gợi ý kết quả tìm kiếm */
+    .search-results {
+      position: absolute;
+      top: 105%;
+      left: 12px;
+      right: 12px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      border: 1px solid #e2e8f0;
+      max-height: 280px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+      text-align: left;
+    }
+    .result-item {
+      padding: 10px 14px;
+      border-bottom: 1px solid #edf2f7;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .result-item:hover, .result-item:active {
+      background: #fbf3f3;
+    }
+    .result-item .r-name { font-weight: bold; font-size: 14px; color: var(--primary); }
+    .result-item .r-sub { font-size: 12px; color: #666; margin-top: 2px; }
+    .result-item .r-gen { font-size: 11px; background: #eee; padding: 2px 7px; border-radius: 10px; font-weight: bold; }
+
+    /* Nút phóng to / thu nhỏ khi ở chế độ cây */
+    .tree-tools {
+      position: fixed;
+      bottom: 20px;
+      right: 15px;
+      z-index: 40;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tool-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1.5px solid #cbd5e0;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ============================================================ */
+    /* CHẾ ĐỘ 1: XEM THEO DANH SÁCH THẾ HỆ (RẤT TIỆN TRÊN ĐIỆN THOẠI) */
+    /* ============================================================ */
+    #listMode {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 0 12px;
+      text-align: left;
+    }
+    .gen-group {
+      margin-bottom: 20px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+    .gen-group-header {
+      background: #faf5eb;
+      border-bottom: 2px solid var(--gold);
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .gen-member-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+      padding: 12px;
+    }
+    .list-card {
+      background: #fdfdfd;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .list-card:hover {
+      background: #fff8f8;
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+    }
+    .list-card-name { font-weight: bold; font-size: 14.5px; color: #1a202c; }
+    .list-card-spouse { font-size: 12px; color: #666; font-style: italic; margin-top: 2px; }
+    .list-card-badge {
+      display: inline-block;
+      margin-top: 5px;
+      font-size: 11px;
+      color: #2b6cb0;
+      background: #ebf8ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* ============================================================ */
+    /* CHẾ ĐỘ 2: SƠ ĐỒ CÂY PHẢ HỆ (TREE VIEW)                       */
+    /* ============================================================ */
+    #treeMode {
+      display: none;
+      width: 100%;
+      overflow-x: auto;
+      padding: 10px 0 80px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tree-viewport {
+      display: inline-block;
+      min-width: 100%;
+      white-space: nowrap;
+      transform-origin: top center;
+      transition: transform 0.2s ease;
+    }
+    .tree ul {
+      padding-top: 25px; position: relative;
+      transition: all 0.5s; display: flex; justify-content: center;
+    }
+    .tree li {
+      text-align: center; list-style-type: none;
+      position: relative; padding: 25px 8px 0 8px;
+    }
+    .tree li::before, .tree li::after {
+      content: ''; position: absolute; top: 0; right: 50%;
+      border-top: 2px solid var(--line); width: 50%; height: 25px;
+    }
+    .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--line); }
+    .tree li:only-child::after, .tree li:only-child::before { display: none; }
+    .tree li:only-child { padding-top: 0; }
+    .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+    .tree li:last-child::before { border-right: 2px solid var(--line); border-radius: 0 6px 0 0; }
+    .tree li:first-child::after { border-radius: 6px 0 0 0; }
+    .tree ul ul::before {
+      content: ''; position: absolute; top: 0; left: 50%;
+      border-left: 2px solid var(--line); width: 0; height: 25px;
+    }
+    .member-card {
+      background: var(--card-bg);
+      border: 1.5px solid #d5dbe1;
+      border-top: 4px solid var(--primary);
+      border-radius: 10px;
+      display: inline-block;
+      padding: 10px 12px;
+      min-width: 155px;
+      max-width: 210px;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+      transition: all 0.25s ease;
+      white-space: normal;
+      vertical-align: top;
+    }
+    .member-card.highlight {
+      border-color: #e53e3e !important;
+      box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.4) !important;
+      background: var(--highlight) !important;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.05); }
+    }
+    .gen-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--primary);
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin-bottom: 5px;
+    }
+    .member-name { font-weight: 700; font-size: 14px; color: #1a202c; line-height: 1.3; }
+    .spouse-name { font-size: 12px; color: #555; font-style: italic; margin-top: 3px; }
+    .children-count {
+      font-size: 11px; color: #2b6cb0; background: #ebf8ff;
+      border: 1px solid #bee3f8; border-radius: 6px;
+      padding: 2px 6px; display: inline-block; margin-top: 5px; font-weight: 600;
+    }
+    .no-children { color: #718096; background: #f7fafc; border-color: #e2e8f0; font-weight: normal; }
+
+    /* Modal Chi Tiết */
+    .modal {
+      display: none; position: fixed; z-index: 1000;
+      left: 0; top: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);
+      align-items: center; justify-content: center;
+    }
+    .modal-content {
+      background: #fff; width: 92%; max-width: 440px;
+      border-radius: 14px; padding: 22px; text-align: left;
+      position: relative; box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+    .close-btn { position: absolute; right: 16px; top: 12px; font-size: 26px; cursor: pointer; color: #888; }
+    .modal-title { color: var(--primary); font-size: 18px; font-weight: bold; margin-bottom: 12px; border-bottom: 2px solid #edf2f7; padding-bottom: 8px; }
+    .info-row { margin-bottom: 10px; font-size: 13.5px; line-height: 1.5; }
+    .info-label { font-weight: 600; color: #4a5568; min-width: 105px; display: inline-block; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Phả Chi Phạm Văn</h1>
+    <p><strong>Tiền Phong Thượng Thôn</strong></p>
+    
+    <!-- Bộ chuyển đổi chế độ xem -->
+    <div class="view-switcher">
+      <button class="view-btn active" id="btnList" onclick="switchView('list')">📱 Danh Sách Các Đời</button>
+      <button class="view-btn" id="btnTree" onclick="switchView('tree')">🌳 Sơ Đồ Cây</button>
+    </div>
+  </header>
+
+  <!-- Khung Tìm Kiếm và Lọc -->
+  <div class="search-section">
+    <div class="search-box-wrap">
+      <select id="genFilter" onchange="performSearch()">
+        <option value="">Tất cả đời</option>
+        <option value="1">Đời I</option>
+        <option value="2">Đời II</option>
+        <option value="3">Đời III</option>
+        <option value="4">Đời IV</option>
+        <option value="5">Đời V</option>
+        <option value="6">Đời VI</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="Nhập tên người cần tìm..." oninput="performSearch()" onfocus="performSearch()">
+    </div>
+    <!-- Kết quả gợi ý dạng popup xổ xuống -->
+    <div id="searchResults" class="search-results"></div>
+  </div>
+
+  <!-- Nút điều khiển Zoom khi ở Chế độ Cây -->
+  <div class="tree-tools" id="treeTools">
+    <button class="tool-btn" onclick="zoomTree(0.15)" title="Phóng to">➕</button>
+    <button class="tool-btn" onclick="zoomTree(-0.15)" title="Thu nhỏ">➖</button>
+    <button class="tool-btn" onclick="resetZoom()" title="Về mặc định" style="font-size: 13px;">100%</button>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 1. CHẾ ĐỘ XEM DANH SÁCH (THUẬN TIỆN TRÊN ĐIỆN THOẠI)     -->
+  <!-- ========================================================= -->
+  <div id="listMode">
+    <!-- Nội dung được tạo tự động bởi JavaScript từ danh sách dữ liệu -->
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 2. CHẾ ĐỘ XEM CÂY (TREE VIEW)                            -->
+  <!-- ========================================================= -->
+  <div id="treeMode">
+    <div class="tree-viewport" id="treeViewport">
+      <div class="tree">
+        <ul>
+          <li>
+            <!-- ĐỜI I -->
+            <div class="member-card" id="card-1" onclick="openDetailsById(1)">
+              <span class="gen-badge">Đời I</span>
+              <div class="member-name">CỤ TIẾU</div>
+              <div class="spouse-name">Vợ: VŨ THỊ HÀNG</div>
+              <div class="children-count">4 người con</div>
+            </div>
+
+            <!-- ĐỜI II -->
+            <ul>
+              <li>
+                <div class="member-card" id="card-2" onclick="openDetailsById(2)">
+                  <span class="gen-badge">Đời II</span>
+                  <div class="member-name">PHẠM HÚY TÁM</div>
+                  <div class="children-count">4 người con</div>
+                </div>
+
+                <!-- ĐỜI III -->
+                <ul>
+                  <li>
+                    <div class="member-card" id="card-6" onclick="openDetailsById(6)">
+                      <span class="gen-badge">Đời III</span>
+                      <div class="member-name">PHẠM HÚY RỘNG</div>
+                      <div class="children-count no-children">0 người con</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="member-card" id="card-7" onclick="openDetailsById(7)">
+                      <span class="gen-badge">Đời III</span>
+                      <div class="member-name">PHẠM VĂN TẶNG</div>
+                      <div class="spouse-name">Vợ: TRỊNH THỊ THẮM</div>
+                      <div class="children-count">3 người con</div>
+                    </div>
+
+                    <!-- ĐỜI IV -->
+                    <ul>
+                      <li>
+                        <div class="member-card" id="card-10" onclick="openDetailsById(10)">
+                          <span class="gen-badge">Đời IV</span>
+                          <div class="member-name">PHẠM VĂN TỨ</div>
+                          <div class="spouse-name">Vợ: MAI THỊ CẬY</div>
+                          <div class="children-count">4 người con</div>
+                        </div>
+
+                        <!-- ĐỜI V -->
+                        <ul>
+                          <li>
+                            <div class="member-card" id="card-13" onclick="openDetailsById(13)">
+                              <span class="gen-badge">Đời V</span>
+                              <div class="member-name">PHẠM VĂN HIỀN</div>
+                              <div class="children-count">3 người con</div>
+                            </div>
+
+                            <!-- ĐỜI VI -->
+                            <ul>
+                              <li>
+                                <div class="member-card" id="card-17" onclick="openDetailsById(17)">
+                                  <span class="gen-badge">Đời VI</span>
+                                  <div class="member-name">PHẠM VĂN DŨNG</div>
+                                  <div class="children-count no-children">Đời thứ VI</div>
+                                </div>
+                              </li>
+                              <li>
+                                <div class="member-card" id="card-18" onclick="openDetailsById(18)">
+                                  <span class="gen-badge">Đời VI</span>
+                                  <div class="member-name">PHẠM VĂN DƯƠNG</div>
+                                  <div class="children-count no-children">Đời thứ VI</div>
+                                </div>
+                              </li>
+                              <li>
+                                <div class="member-card" id="card-19" onclick="openDetailsById(19)">
+                                  <span class="gen-badge">Đời VI</span>
+                                  <div class="member-name">PHẠM VĂN ĐĂNG</div>
+                                  <div class="children-count no-children">Đời thứ VI</div>
+                                </div>
+                              </li>
+                            </ul>
+                          </li>
+
+                          <li>
+                            <div class="member-card" id="card-14" onclick="openDetailsById(14)">
+                              <span class="gen-badge">Đời V</span>
+                              <div class="member-name">PHẠM VĂN HIỂN</div>
+                              <div class="children-count no-children">0 người con</div>
+                            </div>
+                          </li>
+                          <li>
+                            <div class="member-card" id="card-15" onclick="openDetailsById(15)">
+                              <span class="gen-badge">Đời V</span>
+                              <div class="member-name">PHẠM THỊ HÒA</div>
+                              <div class="children-count no-children">0 người con</div>
+                            </div>
+                          </li>
+                          <li>
+                            <div class="member-card" id="card-16" onclick="openDetailsById(16)">
+                              <span class="gen-badge">Đời V</span>
+                              <div class="member-name">PHẠM THỊ HỢP</div>
+                              <div class="children-count no-children">0 người con</div>
+                            </div>
+                          </li>
+                        </ul>
+                      </li>
+
+                      <li>
+                        <div class="member-card" id="card-11" onclick="openDetailsById(11)">
+                          <span class="gen-badge">Đời IV</span>
+                          <div class="member-name">PHẠM VĂN RU</div>
+                          <div class="spouse-name">Vợ: LÊ THỊ HOA</div>
+                          <div class="children-count no-children">0 người con</div>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="member-card" id="card-12" onclick="openDetailsById(12)">
+                          <span class="gen-badge">Đời IV</span>
+                          <div class="member-name">PHẠM THỊ PHƯƠNG</div>
+                          <div class="children-count no-children">0 người con</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </li>
+
+                  <li>
+                    <div class="member-card" id="card-8" onclick="openDetailsById(8)">
+                      <span class="gen-badge">Đời III</span>
+                      <div class="member-name">PHẠM THỊ ÊM</div>
+                      <div class="children-count no-children">0 người con</div>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="member-card" id="card-9" onclick="openDetailsById(9)">
+                      <span class="gen-badge">Đời III</span>
+                      <div class="member-name">PHẠM HÚY ÁI</div>
+                      <div class="spouse-name">Phối ngẫu: HOÀNG VŨ BINH</div>
+                      <div class="children-count no-children">0 người con</div>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+
+              <li>
+                <div class="member-card" id="card-3" onclick="openDetailsById(3)">
+                  <span class="gen-badge">Đời II</span>
+                  <div class="member-name">PHẠM HÚY NGÂN</div>
+                  <div class="children-count no-children">0 người con</div>
+                </div>
+              </li>
+              <li>
+                <div class="member-card" id="card-4" onclick="openDetailsById(4)">
+                  <span class="gen-badge">Đời II</span>
+                  <div class="member-name">PHẠM VĂN TẮC</div>
+                  <div class="spouse-name">Vợ: LÊ THỊ LIÊN</div>
+                  <div class="children-count no-children">0 người con</div>
+                </div>
+              </li>
+              <li>
+                <div class="member-card" id="card-5" onclick="openDetailsById(5)">
+                  <span class="gen-badge">Đời II</span>
+                  <div class="member-name">PHẠM VĂN TỐC</div>
+                  <div class="spouse-name">Vợ: TRẦN THỊ KHÁI</div>
+                  <div class="children-count no-children">0 người con</div>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup Chi Tiết Thành Viên -->
+  <div id="infoModal" class="modal" onclick="closeDetails(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <div id="modalName" class="modal-title">Họ và tên</div>
+      <div class="info-row"><span class="info-label">Thế hệ / Đời:</span> <span id="modalGen" style="font-weight:bold; color:var(--primary);"></span></div>
+      <div class="info-row"><span class="info-label">Phối ngẫu:</span> <span id="modalSpouse"></span></div>
+      <div class="info-row"><span class="info-label">Số con cái:</span> <span id="modalChildren"></span></div>
+      <div class="info-row"><span class="info-label">Danh sách con:</span> <span id="modalChildrenList"></span></div>
+      <div class="info-row"><span class="info-label">Ghi chú:</span> <span id="modalNote" style="color:#666;"></span></div>
+    </div>
+  </div>
+
+  <script>
+    // Cơ sở dữ liệu 19 thành viên từ Excel
+    const members = [
+      { id: 1, name: "CỤ TIẾU", gen: 1, spouse: "VŨ THỊ HÀNG", childrenCount: "4 người con", childrenList: "Phạm Húy Tám, Phạm Húy Ngân, Phạm Văn Tắc, Phạm Văn Tốc", note: "Cụ Khởi Tổ chi phả họ Phạm Văn" },
+      { id: 2, name: "PHẠM HÚY TÁM", gen: 2, spouse: "Chưa ghi nhận", childrenCount: "4 người con", childrenList: "Phạm Húy Rộng, Phạm Văn Tặng, Phạm Thị Êm, Phạm Húy Ái", note: "Con Cụ Tiếu (Nhánh trưởng tiếp nối)" },
+      { id: 3, name: "PHẠM HÚY NGÂN", gen: 2, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tiếu" },
+      { id: 4, name: "PHẠM VĂN TẮC", gen: 2, spouse: "LÊ THỊ LIÊN", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tiếu" },
+      { id: 5, name: "PHẠM VĂN TỐC", gen: 2, spouse: "TRẦN THỊ KHÁI", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tiếu" },
+      { id: 6, name: "PHẠM HÚY RỘNG", gen: 3, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tám" },
+      { id: 7, name: "PHẠM VĂN TẶNG", gen: 3, spouse: "TRỊNH THỊ THẮM", childrenCount: "3 người con", childrenList: "Phạm Văn Tứ, Phạm Văn Ru, Phạm Thị Phương", note: "Con Cụ Tám" },
+      { id: 8, name: "PHẠM THỊ ÊM", gen: 3, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tám" },
+      { id: 9, name: "PHẠM HÚY ÁI", gen: 3, spouse: "HOÀNG VŨ BINH", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tám" },
+      { id: 10, name: "PHẠM VĂN TỨ", gen: 4, spouse: "MAI THỊ CẬY", childrenCount: "4 người con", childrenList: "Phạm Văn Hiền, Phạm Văn Hiển, Phạm Thị Hòa, Phạm Thị Hợp", note: "Con Cụ Tặng" },
+      { id: 11, name: "PHẠM VĂN RU", gen: 4, spouse: "LÊ THỊ HOA", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tặng" },
+      { id: 12, name: "PHẠM THỊ PHƯƠNG", gen: 4, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tặng" },
+      { id: 13, name: "PHẠM VĂN HIỀN", gen: 5, spouse: "Chưa ghi nhận", childrenCount: "3 người con", childrenList: "Phạm Văn Dũng, Phạm Văn Dương, Phạm Văn Đăng", note: "Con Cụ Tứ" },
+      { id: 14, name: "PHẠM VĂN HIỂN", gen: 5, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tứ" },
+      { id: 15, name: "PHẠM THỊ HÒA", gen: 5, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tứ" },
+      { id: 16, name: "PHẠM THỊ HỢP", gen: 5, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tứ" },
+      { id: 17, name: "PHẠM VĂN DŨNG", gen: 6, spouse: "Chưa ghi nhận", childrenCount: "Hậu duệ Đời VI", childrenList: "Chưa ghi nhận", note: "Con Ông Hiền" },
+      { id: 18, name: "PHẠM VĂN DƯƠNG", gen: 6, spouse: "Chưa ghi nhận", childrenCount: "Hậu duệ Đời VI", childrenList: "Chưa ghi nhận", note: "Con Ông Hiền" },
+      { id: 19, name: "PHẠM VĂN ĐĂNG", gen: 6, spouse: "Chưa ghi nhận", childrenCount: "Hậu duệ Đời VI", childrenList: "Chưa ghi nhận", note: "Con Ông Hiền" }
+    ];
+
+    const romanGens = ["", "Đời thứ I", "Đời thứ II", "Đời thứ III", "Đời thứ IV", "Đời thứ V", "Đời thứ VI"];
+
+    // Render danh sách theo từng đời
+    function renderListMode() {
+      const container = document.getElementById('listMode');
+      let html = '';
+      for (let g = 1; g <= 6; g++) {
+        const groupMembers = members.filter(m => m.gen === g);
+        if (groupMembers.length === 0) continue;
+        html += `
+          <div class="gen-group">
+            <div class="gen-group-header">
+              <span>👑 ${romanGens[g]}</span>
+              <span style="font-size:12px; font-weight:normal; opacity:0.8;">${groupMembers.length} thành viên</span>
+            </div>
+            <div class="gen-member-grid">
+              ${groupMembers.map(m => `
+                <div class="list-card" onclick="openDetailsById(${m.id})">
+                  <div class="list-card-name">${m.name}</div>${m.spouse !== "Chưa ghi nhận" ? `<div class="list-card-spouse">Phối ngẫu: ${m.spouse}</div>` : ''}
+                  <div class="list-card-badge">${m.childrenCount}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    // Chuyển chế độ xem: 'list' (di động) hoặc 'tree' (sơ đồ cây)
+    let currentZoom = 1;
+    function switchView(mode) {
+      const listEl = document.getElementById('listMode');
+      const treeEl = document.getElementById('treeMode');
+      const treeTools = document.getElementById('treeTools');
+      const btnList = document.getElementById('btnList');
+      const btnTree = document.getElementById('btnTree');
+
+      if (mode === 'tree') {
+        listEl.style.display = 'none';
+        treeEl.style.display = 'block';
+        treeTools.style.display = 'flex';
+        btnTree.classList.add('active');
+        btnList.classList.remove('active');
+      } else {
+        listEl.style.display = 'block';
+        treeEl.style.display = 'none';
+        treeTools.style.display = 'none';
+        btnList.classList.add('active');
+        btnTree.classList.remove('active');
+      }
+    }
+
+    // Phóng to / Thu nhỏ Sơ Đồ Cây
+    function zoomTree(delta) {
+      currentZoom = Math.min(Math.max(0.4, currentZoom + delta), 1.8);
+      document.getElementById('treeViewport').style.transform = `scale(${currentZoom})`;
+    }
+    function resetZoom() {
+      currentZoom = 1;
+      document.getElementById('treeViewport').style.transform = 'scale(1)';
+    }
+
+    // Xử lý Tìm kiếm & Lọc
+    function performSearch() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const genVal = document.getElementById('genFilter').value;
+      const resContainer = document.getElementById('searchResults');
+
+      if (!query && !genVal) {
+        resContainer.style.display = 'none';
+        return;
+      }
+
+      const filtered = members.filter(m => {
+        const matchName = m.name.toLowerCase().includes(query) || (m.spouse && m.spouse.toLowerCase().includes(query));
+        const matchGen = genVal === "" || m.gen.toString() === genVal;
+        return matchName && matchGen;
+      });
+
+      if (filtered.length === 0) {
+        resContainer.innerHTML = '<div style="padding:12px; color:#888; font-size:13px; text-align:center;">Không tìm thấy thành viên phù hợp</div>';
+        resContainer.style.display = 'block';
+        return;
+      }
+
+      resContainer.innerHTML = filtered.map(m => `
+        <div class="result-item" onclick="selectSearchResult(${m.id})">
+          <div>
+            <div class="r-name">${m.name}</div>
+            <div class="r-sub">${m.spouse !== "Chưa ghi nhận" ? 'Vợ/Chồng: ' + m.spouse : 'Số con: ' + m.childrenCount}</div>
+          </div>
+          <span class="r-gen">${romanGens[m.gen]}</span>
+        </div>
+      `).join('');
+      resContainer.style.display = 'block';
+    }
+
+    // Khi bấm vào 1 người trong kết quả tìm kiếm
+    function selectSearchResult(id) {
+      document.getElementById('searchResults').style.display = 'none';
+      openDetailsById(id);
+
+      // Nếu đang ở chế độ xem cây, tự cuộn tới thẻ đó và viền sáng
+      const card = document.getElementById('card-' + id);
+      if (card) {
+        // Gỡ highlight cũ
+        document.querySelectorAll('.member-card.highlight').forEach(el => el.classList.remove('highlight'));
+        card.classList.add('highlight');
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        }, 150);
+      }
+    }
+
+    // Mở Popup chi tiết
+    function openDetailsById(id) {
+      const m = members.find(item => item.id === id);
+      if (!m) return;
+      document.getElementById('modalName').innerText = m.name;
+      document.getElementById('modalGen').innerText = romanGens[m.gen];
+      document.getElementById('modalSpouse').innerText = m.spouse;
+      document.getElementById('modalChildren').innerText = m.childrenCount;
+      document.getElementById('modalChildrenList').innerText = m.childrenList;
+      document.getElementById('modalNote').innerText = m.note;
+      document.getElementById('infoModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('infoModal').style.display = 'none';
+    }
+    function closeDetails(e) {
+      if (e.target.id === 'infoModal') closeModal();
+    }
+
+    // Đóng danh sách tìm kiếm khi bấm ra ngoài
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.search-section')) {
+        document.getElementById('searchResults').style.display = 'none';
+      }
+    });
+
+    // Tự động nhận diện thiết bị khi mở trang:
+    // Trên điện thoại (< 768px): Mặc định bật Chế độ Danh Sách để xem ngay không cần zoom.
+    // Trên máy tính (>= 768px): Mặc định mở Sơ Đồ Cây hoành tráng.
+    window.addEventListener('DOMContentLoaded', () => {
+      renderListMode();
+      if (window.innerWidth < 768) {
+        switchView('list');
+      } else {
+        switchView('tree');
+      }
+    });
+  </script>
+</body>
+</html>
