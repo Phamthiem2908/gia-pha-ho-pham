@@ -2,8 +2,8 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-  <title>Sơ Đồ Phả Chi Phạm Văn - Tiền Phong Thượng Thôn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Đồ Phả Chi Phạm Văn - Tiền Phong Thượng Thôn</title>
   <style>
     :root {
       --primary: #8b1c1c;
@@ -12,316 +12,311 @@
       --bg: #f5f4ef;
       --card-bg: #ffffff;
       --text: #2d3748;
-      --line: #b0bec5;
-      --highlight: #fffae6;
+      --line: #8b1c1c; /* ĐƯỜNG NỐI CÂY MÀU ĐỎ TRÙNG MÀU Ô */
+      --highlight: #fff3cd;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; text-align: center; }
+    body { background-color: var(--bg); color: var(--text); overflow-x: hidden; position: relative; }
 
     /* Header */
-    header { background: #fff; padding: 18px 12px; border-bottom: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.03); margin-bottom: 15px; }
-    header h1 { color: var(--primary); font-size: 20px; text-transform: uppercase; margin-bottom: 4px; }
-    header p { color: #666; font-size: 13px; }
+    header {
+      background: #fff; padding: 12px 14px 10px 14px;
+      border-bottom: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+      position: relative;
+    }
+    .header-main {
+      display: flex; align-items: center; justify-content: space-between;
+      position: relative;
+    }
+    .header-title {
+      text-align: left; padding-right: 60px;
+    }
+    .header-title h1 {
+      color: var(--primary); font-size: 19px; text-transform: uppercase;
+      margin-bottom: 2px; letter-spacing: 0.5px; line-height: 1.25;
+    }
+    .header-title p { font-size: 12px; color: #555; }
 
-    /* Thanh điều khiển trên di động: Chuyển chế độ xem */
+    /* MÃ QR GÓC PHẢI */
+    .qr-corner {
+      position: absolute; top: 0; right: 0; z-index: 150;
+      display: flex; flex-direction: column; align-items: center;
+      cursor: pointer; background: #ffffff; padding: 3px 5px;
+      border-radius: 8px; border: 1.5px solid var(--gold);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12); transition: transform 0.2s;
+    }
+    .qr-corner:hover { transform: scale(1.05); }
+    .qr-corner img { width: 38px; height: 38px; display: block; border-radius: 4px; }
+    .qr-corner span { font-size: 8.5px; color: #333; margin-top: 2px; font-weight: 700; }
+    @media (min-width: 768px) {
+      .header-title { text-align: center; padding-right: 0; width: 100%; }
+      .qr-corner { top: 10px; right: 15px; padding: 4px 6px; }
+      .qr-corner img { width: 44px; height: 44px; }
+      .qr-corner span { font-size: 9.5px; }
+    }
+
+    /* THÔNG TIN ÂM LỊCH & NGÀY GIỖ */
+    .lunar-banner-plain {
+      max-width: 850px; margin: 8px auto 2px auto; padding: 4px 8px;
+      text-align: center; line-height: 1.55; font-size: 13.5px; color: #2d3748;
+    }
+    .lunar-main-line { font-weight: 700; color: #7b341e; }
+    .lunar-anniv-line { font-size: 13px; color: #333; margin-top: 3px; }
+    .anniv-person-tag { font-weight: bold; color: var(--primary); }
+    .anniv-days-tag { font-weight: 700; color: #c53030; }
+    .btn-quick-find {
+      display: inline-block; margin-left: 6px; padding: 1px 7px; font-size: 11px;
+      background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 4px;
+      color: var(--primary); cursor: pointer; text-decoration: none;
+    }
+
+    /* BỘ CHUYỂN ĐỔI TAB: SƠ ĐỒ CÂY VÀ DANH SÁCH CÁC ĐỜI */
+    .tab-bar-center { text-align: center; }
     .view-switcher {
-      display: inline-flex;
-      background: #edf2f7;
-      padding: 4px;
-      border-radius: 25px;
-      margin-top: 10px;
+      display: inline-flex; background: #e2e8f0; padding: 4px;
+      border-radius: 25px; margin: 8px auto 6px auto;
     }
     .view-btn {
-      border: none;
-      background: transparent;
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #4a5568;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.2s;
+      border: none; background: transparent; padding: 6px 16px;
+      font-size: 13px; font-weight: 600; color: #4a5568;
+      border-radius: 20px; cursor: pointer; transition: all 0.2s;
     }
     .view-btn.active {
-      background: var(--primary);
-      color: #fff;
+      background: var(--primary); color: #fff;
       box-shadow: 0 2px 5px rgba(139, 28, 28, 0.3);
     }
 
-    /* Khung Tìm Kiếm & Bộ Lọc */
+    /* Khung Tìm Kiếm */
     .search-section {
-      max-width: 600px;
-      margin: 0 auto 16px auto;
-      padding: 0 12px;
-      position: relative;
+      max-width: 580px; margin: 6px auto 10px auto; padding: 0 12px;
+      position: relative; z-index: 100;
     }
     .search-box-wrap {
-      display: flex;
-      gap: 6px;
-      background: #fff;
-      padding: 6px 8px;
-      border-radius: 12px;
-      border: 1.5px solid #cbd5e0;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.04);
+      display: flex; gap: 6px; background: #fff; padding: 5px 8px;
+      border-radius: 12px; border: 1.5px solid #cbd5e0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
     }
     .search-box-wrap:focus-within {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(139, 28, 28, 0.15);
+      border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139, 28, 28, 0.15);
     }
     #genFilter {
-      border: none;
-      background: #f7fafc;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--primary);
-      padding: 6px 8px;
-      border-radius: 8px;
-      outline: none;
-      cursor: pointer;
-      border: 1px solid #e2e8f0;
-      max-width: 120px;
+      border: none; background: #f7fafc; font-size: 13px; font-weight: 600;
+      color: var(--primary); padding: 5px 8px; border-radius: 8px;
+      outline: none; cursor: pointer; border: 1px solid #e2e8f0;
     }
     #searchInput {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-size: 14px;
-      padding: 6px 8px;
-      color: #333;
+      flex: 1; border: none; outline: none; font-size: 13.5px;
+      padding: 5px 8px; color: #333;
     }
-    /* Menu gợi ý kết quả tìm kiếm */
     .search-results {
-      position: absolute;
-      top: 105%;
-      left: 12px;
-      right: 12px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      border: 1px solid #e2e8f0;
-      max-height: 280px;
-      overflow-y: auto;
-      z-index: 50;
-      display: none;
-      text-align: left;
+      position: absolute; top: 105%; left: 12px; right: 12px; background: #fff;
+      border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      border: 1px solid #e2e8f0; max-height: 280px; overflow-y: auto;
+      z-index: 200; display: none; text-align: left;
     }
     .result-item {
-      padding: 10px 14px;
-      border-bottom: 1px solid #edf2f7;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 10px 14px; border-bottom: 1px solid #edf2f7; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
     }
-    .result-item:hover, .result-item:active {
-      background: #fbf3f3;
-    }
+    .result-item:hover { background: #fbf3f3; }
     .result-item .r-name { font-weight: bold; font-size: 14px; color: var(--primary); }
     .result-item .r-sub { font-size: 12px; color: #666; margin-top: 2px; }
     .result-item .r-gen { font-size: 11px; background: #eee; padding: 2px 7px; border-radius: 10px; font-weight: bold; }
 
-    /* Nút phóng to / thu nhỏ khi ở chế độ cây */
-    .tree-tools {
-      position: fixed;
-      bottom: 20px;
-      right: 15px;
-      z-index: 40;
-      display: none;
-      flex-direction: column;
-      gap: 8px;
+    /* ============================================================ */
+    /* 1. CHẾ ĐỘ SƠ ĐỒ CÂY (TREE VIEWPORT)                          */
+    /* ============================================================ */
+    #treeCanvas {
+      width: 100vw; height: 75vh; min-height: 520px; overflow: hidden;
+      position: relative; cursor: grab; touch-action: none; background: #ece9df;
+      border-top: 1px solid #dcd7ca; border-bottom: 1px solid #dcd7ca;
     }
-    .tool-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #fff;
-      border: 1.5px solid #cbd5e0;
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    #treeCanvas:active { cursor: grabbing; }
+
+    #panContainer {
+      position: absolute; top: 0; left: 0; transform-origin: 0 0;
+      padding: 60px 100px 150px 100px; white-space: nowrap; will-change: transform;
+      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    /* ============================================================ */
-    /* CHẾ ĐỘ 1: XEM THEO DANH SÁCH THẾ HỆ (RẤT TIỆN TRÊN ĐIỆN THOẠI) */
-    /* ============================================================ */
-    #listMode {
-      max-width: 650px;
-      margin: 0 auto;
-      padding: 0 12px;
-      text-align: left;
+    /* ĐÁNH DẤU Ô THÀNH VIÊN ĐƯỢC CHỌN NỔI BẬT */
+    .member-card.highlight {
+      border-color: #e53e3e !important;
+      box-shadow: 0 0 0 5px rgba(229, 62, 62, 0.85), 0 8px 24px rgba(229, 62, 62, 0.45) !important;
+      background: var(--highlight) !important;
+      transform: scale(1.08); z-index: 60;
+      animation: pulseMarker 1.2s infinite alternate;
     }
-    .gen-group {
-      margin-bottom: 20px;
-      background: #fff;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    @keyframes pulseMarker {
+      from { transform: scale(1.05); }
+      to { transform: scale(1.1); }
     }
-    .gen-group-header {
-      background: #faf5eb;
-      border-bottom: 2px solid var(--gold);
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .marker-badge {
+      display: none; position: absolute; top: -11px; right: -10px;
+      background: #e53e3e; color: #fff; font-size: 10px; font-weight: bold;
+      padding: 2px 7px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     }
-    .gen-member-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 10px;
-      padding: 12px;
-    }
-    .list-card {
-      background: #fdfdfd;
-      border: 1px solid #e2e8f0;
-      border-left: 4px solid var(--primary);
-      border-radius: 8px;
-      padding: 10px 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .list-card:hover {
-      background: #fff8f8;
-      transform: translateY(-2px);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.06);
-    }
-    .list-card-name { font-weight: bold; font-size: 14.5px; color: #1a202c; }
-    .list-card-spouse { font-size: 12px; color: #666; font-style: italic; margin-top: 2px; }
-    .list-card-badge {
-      display: inline-block;
-      margin-top: 5px;
-      font-size: 11px;
-      color: #2b6cb0;
-      background: #ebf8ff;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
+    .member-card.highlight .marker-badge { display: block; }
 
-    /* ============================================================ */
-    /* CHẾ ĐỘ 2: SƠ ĐỒ CÂY PHẢ HỆ (TREE VIEW)                       */
-    /* ============================================================ */
-    #treeMode {
-      display: none;
-      width: 100%;
-      overflow-x: auto;
-      padding: 10px 0 80px 0;
-      -webkit-overflow-scrolling: touch;
-    }
-    .tree-viewport {
-      display: inline-block;
-      min-width: 100%;
-      white-space: nowrap;
-      transform-origin: top center;
-      transition: transform 0.2s ease;
-    }
-    .tree ul {
-      padding-top: 25px; position: relative;
-      transition: all 0.5s; display: flex; justify-content: center;
-    }
-    .tree li {
-      text-align: center; list-style-type: none;
-      position: relative; padding: 25px 8px 0 8px;
-    }
+    /* ĐƯỜNG NỐI CÂY GIA PHẢ MÀU ĐỎ TRÙNG MÀU Ô */
+    .tree { display: inline-block; text-align: center; }
+    .tree ul { padding-top: 25px; position: relative; display: flex; justify-content: center; }
+    .tree li { text-align: center; list-style-type: none; position: relative; padding: 25px 6px 0 6px; }
     .tree li::before, .tree li::after {
       content: ''; position: absolute; top: 0; right: 50%;
-      border-top: 2px solid var(--line); width: 50%; height: 25px;
+      border-top: 2.5px solid var(--line); width: 50%; height: 25px;
     }
-    .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--line); }
+    .tree li::after { right: auto; left: 50%; border-left: 2.5px solid var(--line); }
     .tree li:only-child::after, .tree li:only-child::before { display: none; }
     .tree li:only-child { padding-top: 0; }
     .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-    .tree li:last-child::before { border-right: 2px solid var(--line); border-radius: 0 6px 0 0; }
+    .tree li:last-child::before { border-right: 2.5px solid var(--line); border-radius: 0 6px 0 0; }
     .tree li:first-child::after { border-radius: 6px 0 0 0; }
     .tree ul ul::before {
       content: ''; position: absolute; top: 0; left: 50%;
-      border-left: 2px solid var(--line); width: 0; height: 25px;
+      border-left: 2.5px solid var(--line); width: 0; height: 25px;
     }
+
+    /* Thẻ thành viên */
     .member-card {
-      background: var(--card-bg);
-      border: 1.5px solid #d5dbe1;
-      border-top: 4px solid var(--primary);
-      border-radius: 10px;
-      display: inline-block;
-      padding: 10px 12px;
-      min-width: 155px;
-      max-width: 210px;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.06);
-      transition: all 0.25s ease;
-      white-space: normal;
-      vertical-align: top;
+      position: relative; background: var(--card-bg);
+      border: 1.5px solid #cbd5e0; border-top: 4px solid var(--primary);
+      border-radius: 9px; display: inline-block; padding: 9px 13px;
+      min-width: 145px; width: fit-content; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06); transition: box-shadow 0.2s ease, border-color 0.2s ease;
+      vertical-align: top; text-align: center;
     }
-    .member-card.highlight {
-      border-color: #e53e3e !important;
-      box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.4) !important;
-      background: var(--highlight) !important;
-      animation: pulse 1s infinite alternate;
-    }
-    @keyframes pulse {
-      from { transform: scale(1); }
-      to { transform: scale(1.05); }
+    .member-card:hover {
+      box-shadow: 0 6px 14px rgba(139, 28, 28, 0.2); border-color: var(--primary);
     }
     .gen-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      color: #fff;
-      background: var(--primary);
-      padding: 2px 7px;
-      border-radius: 10px;
-      margin-bottom: 5px;
+      display: inline-block; font-size: 10px; font-weight: 700;
+      color: #fff; background: var(--primary); padding: 1px 6px;
+      border-radius: 8px; margin-bottom: 4px;
     }
-    .member-name { font-weight: 700; font-size: 14px; color: #1a202c; line-height: 1.3; }
-    .spouse-name { font-size: 12px; color: #555; font-style: italic; margin-top: 3px; }
+    .member-name {
+      font-weight: 700; font-size: 13.8px; color: #1a202c;
+      white-space: nowrap !important;
+    }
+    .spouse-name {
+      font-size: 11.5px; color: #555; font-style: italic; margin-top: 2px;
+      white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis;
+    }
     .children-count {
-      font-size: 11px; color: #2b6cb0; background: #ebf8ff;
-      border: 1px solid #bee3f8; border-radius: 6px;
-      padding: 2px 6px; display: inline-block; margin-top: 5px; font-weight: 600;
+      font-size: 10.5px; color: #2b6cb0; background: #ebf8ff;
+      border: 1px solid #bee3f8; border-radius: 5px;
+      padding: 1px 5px; display: inline-block; margin-top: 4px;
+      font-weight: 600; white-space: nowrap;
     }
-    .no-children { color: #718096; background: #f7fafc; border-color: #e2e8f0; font-weight: normal; }
 
-    /* Modal Chi Tiết */
-    .modal {
-      display: none; position: fixed; z-index: 1000;
-      left: 0; top: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);
-      align-items: center; justify-content: center;
+    /* Nút Zoom nhanh */
+    .zoom-controls {
+      position: fixed; bottom: 20px; right: 20px; display: flex;
+      flex-direction: column; gap: 8px; z-index: 90;
     }
-    .modal-content {
-      background: #fff; width: 92%; max-width: 440px;
-      border-radius: 14px; padding: 22px; text-align: left;
-      position: relative; box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    .zoom-btn {
+      width: 40px; height: 40px; border-radius: 50%; background: #fff;
+      border: 1.5px solid #cbd5e0; font-size: 16px; font-weight: bold;
+      color: #333; box-shadow: 0 4px 10px rgba(0,0,0,0.15); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
     }
-    .close-btn { position: absolute; right: 16px; top: 12px; font-size: 26px; cursor: pointer; color: #888; }
-    .modal-title { color: var(--primary); font-size: 18px; font-weight: bold; margin-bottom: 12px; border-bottom: 2px solid #edf2f7; padding-bottom: 8px; }
-    .info-row { margin-bottom: 10px; font-size: 13.5px; line-height: 1.5; }
-    .info-label { font-weight: 600; color: #4a5568; min-width: 105px; display: inline-block; }
+
+    /* ============================================================ */
+    /* 2. CHẾ ĐỘ DANH SÁCH CÁC ĐỜI (LIST VIEW)                      */
+    /* ============================================================ */
+    #listMode {
+      display: none; max-width: 680px; margin: 0 auto;
+      padding: 10px 12px 60px 12px; text-align: left;
+    }
+    .gen-group {
+      margin-bottom: 18px; background: #fff; border-radius: 12px;
+      border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+    .gen-group-header {
+      background: #faf5eb; border-bottom: 2px solid var(--gold);
+      padding: 10px 14px; font-size: 14px; font-weight: 700;
+      color: var(--primary); display: flex; justify-content: space-between; align-items: center;
+    }
+    .gen-member-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 10px; padding: 12px;
+    }
+    .list-card {
+      background: #fdfdfd; border: 1px solid #e2e8f0;
+      border-left: 4px solid var(--primary); border-radius: 8px;
+      padding: 10px 12px; cursor: pointer; transition: all 0.2s;
+    }
+    .list-card:hover { background: #fff8f8; box-shadow: 0 3px 8px rgba(0,0,0,0.06); }
+    .list-card-name { font-weight: bold; font-size: 14px; color: #1a202c; white-space: nowrap; }
+    .list-card-spouse { font-size: 12px; color: #666; font-style: italic; margin-top: 2px; }
+    .list-card-badge {
+      display: inline-block; margin-top: 5px; font-size: 11px;
+      color: #2b6cb0; background: #ebf8ff; padding: 2px 6px;
+      border-radius: 4px; font-weight: 600;
+    }
+
+    /* Modal Chi Tiết & QR */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px);
+      display: none; align-items: center; justify-content: center; z-index: 300;
+    }
+    .modal-card {
+      background: #fff; border-radius: 12px; width: 92%; max-width: 430px;
+      padding: 22px; text-align: left; position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25); animation: popIn 0.2s ease-out;
+    }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+    .modal-close {
+      position: absolute; right: 14px; top: 10px; font-size: 24px;
+      cursor: pointer; color: #888; background: none; border: none;
+    }
+    .modal-close:hover { color: var(--primary); }
+    .modal-title {
+      color: var(--primary); font-size: 18px; font-weight: bold;
+      border-bottom: 2px solid #edf2f7; padding-bottom: 8px; margin-bottom: 12px; padding-right: 25px;
+    }
+    .modal-row { margin-bottom: 8px; font-size: 13.5px; line-height: 1.5; }
+    .modal-label { font-weight: 600; color: #4a5568; min-width: 95px; display: inline-block; }
   </style>
 </head>
 <body>
 
+  <!-- Header -->
   <header>
-    <h1>Phả Chi Phạm Văn</h1>
-    <p><strong>Tiền Phong Thượng Thôn</strong></p>
-    
-    <!-- Bộ chuyển đổi chế độ xem -->
-    <div class="view-switcher">
-      <button class="view-btn active" id="btnList" onclick="switchView('list')">📱 Danh Sách Các Đời</button>
-      <button class="view-btn" id="btnTree" onclick="switchView('tree')">🌳 Sơ Đồ Cây</button>
+    <div class="header-main">
+      <div class="header-title">
+        <h1>ĐỒ PHẢ CHI PHẠM VĂN</h1>
+        <p>Tiền Phong Thượng Thôn (186 thành viên qua 7 đời)</p>
+      </div>
+
+      <!-- NÚT MÃ QR GÓC PHẢI -->
+      <div class="qr-corner" onclick="openQrModal()" title="Bấm để xem ảnh phóng to">
+        <img src="qrcode_405547042_0d24b082aebfdbf3e413435108a5d9f1.png" alt="Mã QR" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(window.location.href)">
+        <span>Mã QR</span>
+      </div>
+    </div>
+
+    <!-- DÒNG THÔNG TIN ÂM LỊCH & NGÀY GIỖ CẬN KỀ -->
+    <div class="lunar-banner-plain">
+      <div class="lunar-main-line">
+        Âm lịch hôm nay ngày: <span id="currentLunarDate">...</span>
+      </div>
+      <div class="lunar-anniv-line" id="nextAnnivLine">
+        Đang tải thông tin ngày giỗ cận kề...
+      </div>
+    </div>
+
+    <!-- BỘ CHUYỂN ĐỔI TAB: SƠ ĐỒ CÂY VÀ DANH SÁCH CÁC ĐỜI -->
+    <div class="tab-bar-center">
+      <div class="view-switcher">
+        <button class="view-btn active" id="btnTree" onclick="switchView('tree')">🌳 Sơ Đồ Cây</button>
+        <button class="view-btn" id="btnList" onclick="switchView('list')">📱 Danh Sách Các Đời</button>
+      </div>
     </div>
   </header>
 
-  <!-- Khung Tìm Kiếm và Lọc -->
+  <!-- Khung Tìm Kiếm -->
   <div class="search-section">
     <div class="search-box-wrap">
       <select id="genFilter" onchange="performSearch()">
@@ -332,249 +327,303 @@
         <option value="4">Đời IV</option>
         <option value="5">Đời V</option>
         <option value="6">Đời VI</option>
+        <option value="7">Đời VII</option>
       </select>
-      <input type="text" id="searchInput" placeholder="Nhập tên người cần tìm..." oninput="performSearch()" onfocus="performSearch()">
+      <input type="text" id="searchInput" placeholder="Tìm kiếm thành viên (hỗ trợ gõ không dấu)..." oninput="performSearch()" onfocus="performSearch()">
     </div>
-    <!-- Kết quả gợi ý dạng popup xổ xuống -->
     <div id="searchResults" class="search-results"></div>
   </div>
 
-  <!-- Nút điều khiển Zoom khi ở Chế độ Cây -->
-  <div class="tree-tools" id="treeTools">
-    <button class="tool-btn" onclick="zoomTree(0.15)" title="Phóng to">➕</button>
-    <button class="tool-btn" onclick="zoomTree(-0.15)" title="Thu nhỏ">➖</button>
-    <button class="tool-btn" onclick="resetZoom()" title="Về mặc định" style="font-size: 13px;">100%</button>
-  </div>
-
   <!-- ========================================================= -->
-  <!-- 1. CHẾ ĐỘ XEM DANH SÁCH (THUẬN TIỆN TRÊN ĐIỆN THOẠI)     -->
+  <!-- 1. CHẾ ĐỘ SƠ ĐỒ CÂY                                        -->
   <!-- ========================================================= -->
-  <div id="listMode">
-    <!-- Nội dung được tạo tự động bởi JavaScript từ danh sách dữ liệu -->
-  </div>
-
-  <!-- ========================================================= -->
-  <!-- 2. CHẾ ĐỘ XEM CÂY (TREE VIEW)                            -->
-  <!-- ========================================================= -->
-  <div id="treeMode">
-    <div class="tree-viewport" id="treeViewport">
-      <div class="tree">
-        <ul>
-          <li>
-            <!-- ĐỜI I -->
-            <div class="member-card" id="card-1" onclick="openDetailsById(1)">
-              <span class="gen-badge">Đời I</span>
-              <div class="member-name">CỤ TIẾU</div>
-              <div class="spouse-name">Vợ: VŨ THỊ HÀNG</div>
-              <div class="children-count">4 người con</div>
-            </div>
-
-            <!-- ĐỜI II -->
-            <ul>
-              <li>
-                <div class="member-card" id="card-2" onclick="openDetailsById(2)">
-                  <span class="gen-badge">Đời II</span>
-                  <div class="member-name">PHẠM HÚY TÁM</div>
-                  <div class="children-count">4 người con</div>
-                </div>
-
-                <!-- ĐỜI III -->
-                <ul>
-                  <li>
-                    <div class="member-card" id="card-6" onclick="openDetailsById(6)">
-                      <span class="gen-badge">Đời III</span>
-                      <div class="member-name">PHẠM HÚY RỘNG</div>
-                      <div class="children-count no-children">0 người con</div>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="member-card" id="card-7" onclick="openDetailsById(7)">
-                      <span class="gen-badge">Đời III</span>
-                      <div class="member-name">PHẠM VĂN TẶNG</div>
-                      <div class="spouse-name">Vợ: TRỊNH THỊ THẮM</div>
-                      <div class="children-count">3 người con</div>
-                    </div>
-
-                    <!-- ĐỜI IV -->
-                    <ul>
-                      <li>
-                        <div class="member-card" id="card-10" onclick="openDetailsById(10)">
-                          <span class="gen-badge">Đời IV</span>
-                          <div class="member-name">PHẠM VĂN TỨ</div>
-                          <div class="spouse-name">Vợ: MAI THỊ CẬY</div>
-                          <div class="children-count">4 người con</div>
-                        </div>
-
-                        <!-- ĐỜI V -->
-                        <ul>
-                          <li>
-                            <div class="member-card" id="card-13" onclick="openDetailsById(13)">
-                              <span class="gen-badge">Đời V</span>
-                              <div class="member-name">PHẠM VĂN HIỀN</div>
-                              <div class="children-count">3 người con</div>
-                            </div>
-
-                            <!-- ĐỜI VI -->
-                            <ul>
-                              <li>
-                                <div class="member-card" id="card-17" onclick="openDetailsById(17)">
-                                  <span class="gen-badge">Đời VI</span>
-                                  <div class="member-name">PHẠM VĂN DŨNG</div>
-                                  <div class="children-count no-children">Đời thứ VI</div>
-                                </div>
-                              </li>
-                              <li>
-                                <div class="member-card" id="card-18" onclick="openDetailsById(18)">
-                                  <span class="gen-badge">Đời VI</span>
-                                  <div class="member-name">PHẠM VĂN DƯƠNG</div>
-                                  <div class="children-count no-children">Đời thứ VI</div>
-                                </div>
-                              </li>
-                              <li>
-                                <div class="member-card" id="card-19" onclick="openDetailsById(19)">
-                                  <span class="gen-badge">Đời VI</span>
-                                  <div class="member-name">PHẠM VĂN ĐĂNG</div>
-                                  <div class="children-count no-children">Đời thứ VI</div>
-                                </div>
-                              </li>
-                            </ul>
-                          </li>
-
-                          <li>
-                            <div class="member-card" id="card-14" onclick="openDetailsById(14)">
-                              <span class="gen-badge">Đời V</span>
-                              <div class="member-name">PHẠM VĂN HIỂN</div>
-                              <div class="children-count no-children">0 người con</div>
-                            </div>
-                          </li>
-                          <li>
-                            <div class="member-card" id="card-15" onclick="openDetailsById(15)">
-                              <span class="gen-badge">Đời V</span>
-                              <div class="member-name">PHẠM THỊ HÒA</div>
-                              <div class="children-count no-children">0 người con</div>
-                            </div>
-                          </li>
-                          <li>
-                            <div class="member-card" id="card-16" onclick="openDetailsById(16)">
-                              <span class="gen-badge">Đời V</span>
-                              <div class="member-name">PHẠM THỊ HỢP</div>
-                              <div class="children-count no-children">0 người con</div>
-                            </div>
-                          </li>
-                        </ul>
-                      </li>
-
-                      <li>
-                        <div class="member-card" id="card-11" onclick="openDetailsById(11)">
-                          <span class="gen-badge">Đời IV</span>
-                          <div class="member-name">PHẠM VĂN RU</div>
-                          <div class="spouse-name">Vợ: LÊ THỊ HOA</div>
-                          <div class="children-count no-children">0 người con</div>
-                        </div>
-                      </li>
-                      <li>
-                        <div class="member-card" id="card-12" onclick="openDetailsById(12)">
-                          <span class="gen-badge">Đời IV</span>
-                          <div class="member-name">PHẠM THỊ PHƯƠNG</div>
-                          <div class="children-count no-children">0 người con</div>
-                        </div>
-                      </li>
-                    </ul>
-                  </li>
-
-                  <li>
-                    <div class="member-card" id="card-8" onclick="openDetailsById(8)">
-                      <span class="gen-badge">Đời III</span>
-                      <div class="member-name">PHẠM THỊ ÊM</div>
-                      <div class="children-count no-children">0 người con</div>
-                    </div>
-                  </li>
-                  <li>
-                    <div class="member-card" id="card-9" onclick="openDetailsById(9)">
-                      <span class="gen-badge">Đời III</span>
-                      <div class="member-name">PHẠM HÚY ÁI</div>
-                      <div class="spouse-name">Phối ngẫu: HOÀNG VŨ BINH</div>
-                      <div class="children-count no-children">0 người con</div>
-                    </div>
-                  </li>
-                </ul>
-              </li>
-
-              <li>
-                <div class="member-card" id="card-3" onclick="openDetailsById(3)">
-                  <span class="gen-badge">Đời II</span>
-                  <div class="member-name">PHẠM HÚY NGÂN</div>
-                  <div class="children-count no-children">0 người con</div>
-                </div>
-              </li>
-              <li>
-                <div class="member-card" id="card-4" onclick="openDetailsById(4)">
-                  <span class="gen-badge">Đời II</span>
-                  <div class="member-name">PHẠM VĂN TẮC</div>
-                  <div class="spouse-name">Vợ: LÊ THỊ LIÊN</div>
-                  <div class="children-count no-children">0 người con</div>
-                </div>
-              </li>
-              <li>
-                <div class="member-card" id="card-5" onclick="openDetailsById(5)">
-                  <span class="gen-badge">Đời II</span>
-                  <div class="member-name">PHẠM VĂN TỐC</div>
-                  <div class="spouse-name">Vợ: TRẦN THỊ KHÁI</div>
-                  <div class="children-count no-children">0 người con</div>
-                </div>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
+  <div id="treeCanvas">
+    <div id="panContainer">
+      <div class="tree" id="treeRootContainer"></div>
     </div>
   </div>
 
-  <!-- Popup Chi Tiết Thành Viên -->
-  <div id="infoModal" class="modal" onclick="closeDetails(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <div id="modalName" class="modal-title">Họ và tên</div>
-      <div class="info-row"><span class="info-label">Thế hệ / Đời:</span> <span id="modalGen" style="font-weight:bold; color:var(--primary);"></span></div>
-      <div class="info-row"><span class="info-label">Phối ngẫu:</span> <span id="modalSpouse"></span></div>
-      <div class="info-row"><span class="info-label">Số con cái:</span> <span id="modalChildren"></span></div>
-      <div class="info-row"><span class="info-label">Danh sách con:</span> <span id="modalChildrenList"></span></div>
-      <div class="info-row"><span class="info-label">Ghi chú:</span> <span id="modalNote" style="color:#666;"></span></div>
+  <!-- Nút điều khiển Zoom -->
+  <div class="zoom-controls">
+    <button class="zoom-btn" onclick="zoomAction(1.2)" title="Phóng to">➕</button>
+    <button class="zoom-btn" onclick="zoomAction(0.8)" title="Thu nhỏ">➖</button>
+    <button class="zoom-btn" onclick="resetToCenter()" title="Về trung tâm Cụ Tổ" style="font-size: 12px;">Tổ</button>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 2. CHẾ ĐỘ DANH SÁCH CÁC ĐỜI                              -->
+  <!-- ========================================================= -->
+  <div id="listMode"></div>
+
+  <!-- Modal Chi Tiết Thành Viên -->
+  <div class="modal-overlay" id="infoModal" onclick="closeInfoModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeInfoModal()">&times;</button>
+      <div class="modal-title" id="mName">Họ và tên</div>
+      <div class="modal-row"><span class="modal-label">Thế hệ / Đời:</span> <span id="mGen" style="font-weight:bold; color:var(--primary);"></span></div>
+      <div class="modal-row"><span class="modal-label" id="mSpouseLabel">Vợ/Chồng:</span> <span id="mSpouse"></span></div>
+      <div class="modal-row"><span class="modal-label">Số con cái:</span> <span id="mChildren"></span></div>
+      <div class="modal-row"><span class="modal-label">Ngày giỗ ÂL:</span> <span id="mDeathAnniv"></span></div>
+      <div class="modal-row"><span class="modal-label">Danh sách con:</span> <span id="mChildrenList"></span></div>
+      <div class="modal-row"><span class="modal-label">Ghi chú:</span> <span id="mNote" style="color:#666;"></span></div>
+    </div>
+  </div>
+
+  <!-- Modal Phóng To QR -->
+  <div class="modal-overlay" id="qrModal" onclick="closeQrModal()">
+    <div class="modal-card" style="text-align:center;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeQrModal()">&times;</button>
+      <h3 style="color:var(--primary); margin-bottom:12px;">MÃ QR GIA PHẢ</h3>
+      <img id="qrImg" src="qrcode_405547042_0d24b082aebfdbf3e413435108a5d9f1.png" alt="Mã QR" style="max-width:240px; width:100%; border-radius:8px;" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(window.location.href)">
+      <p style="font-size:12.5px; color:#666; margin-top:10px;">Quét để truy cập gia phả trên điện thoại</p>
     </div>
   </div>
 
   <script>
-    // Cơ sở dữ liệu 19 thành viên từ Excel
-    const members = [
-      { id: 1, name: "CỤ TIẾU", gen: 1, spouse: "VŨ THỊ HÀNG", childrenCount: "4 người con", childrenList: "Phạm Húy Tám, Phạm Húy Ngân, Phạm Văn Tắc, Phạm Văn Tốc", note: "Cụ Khởi Tổ chi phả họ Phạm Văn" },
-      { id: 2, name: "PHẠM HÚY TÁM", gen: 2, spouse: "Chưa ghi nhận", childrenCount: "4 người con", childrenList: "Phạm Húy Rộng, Phạm Văn Tặng, Phạm Thị Êm, Phạm Húy Ái", note: "Con Cụ Tiếu (Nhánh trưởng tiếp nối)" },
-      { id: 3, name: "PHẠM HÚY NGÂN", gen: 2, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tiếu" },
-      { id: 4, name: "PHẠM VĂN TẮC", gen: 2, spouse: "LÊ THỊ LIÊN", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tiếu" },
-      { id: 5, name: "PHẠM VĂN TỐC", gen: 2, spouse: "TRẦN THỊ KHÁI", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tiếu" },
-      { id: 6, name: "PHẠM HÚY RỘNG", gen: 3, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tám" },
-      { id: 7, name: "PHẠM VĂN TẶNG", gen: 3, spouse: "TRỊNH THỊ THẮM", childrenCount: "3 người con", childrenList: "Phạm Văn Tứ, Phạm Văn Ru, Phạm Thị Phương", note: "Con Cụ Tám" },
-      { id: 8, name: "PHẠM THỊ ÊM", gen: 3, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tám" },
-      { id: 9, name: "PHẠM HÚY ÁI", gen: 3, spouse: "HOÀNG VŨ BINH", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tám" },
-      { id: 10, name: "PHẠM VĂN TỨ", gen: 4, spouse: "MAI THỊ CẬY", childrenCount: "4 người con", childrenList: "Phạm Văn Hiền, Phạm Văn Hiển, Phạm Thị Hòa, Phạm Thị Hợp", note: "Con Cụ Tặng" },
-      { id: 11, name: "PHẠM VĂN RU", gen: 4, spouse: "LÊ THỊ HOA", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tặng" },
-      { id: 12, name: "PHẠM THỊ PHƯƠNG", gen: 4, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tặng" },
-      { id: 13, name: "PHẠM VĂN HIỀN", gen: 5, spouse: "Chưa ghi nhận", childrenCount: "3 người con", childrenList: "Phạm Văn Dũng, Phạm Văn Dương, Phạm Văn Đăng", note: "Con Cụ Tứ" },
-      { id: 14, name: "PHẠM VĂN HIỂN", gen: 5, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tứ" },
-      { id: 15, name: "PHẠM THỊ HÒA", gen: 5, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tứ" },
-      { id: 16, name: "PHẠM THỊ HỢP", gen: 5, spouse: "Chưa ghi nhận", childrenCount: "0", childrenList: "Chưa ghi nhận trong sơ đồ", note: "Con Cụ Tứ" },
-      { id: 17, name: "PHẠM VĂN DŨNG", gen: 6, spouse: "Chưa ghi nhận", childrenCount: "Hậu duệ Đời VI", childrenList: "Chưa ghi nhận", note: "Con Ông Hiền" },
-      { id: 18, name: "PHẠM VĂN DƯƠNG", gen: 6, spouse: "Chưa ghi nhận", childrenCount: "Hậu duệ Đời VI", childrenList: "Chưa ghi nhận", note: "Con Ông Hiền" },
-      { id: 19, name: "PHẠM VĂN ĐĂNG", gen: 6, spouse: "Chưa ghi nhận", childrenCount: "Hậu duệ Đời VI", childrenList: "Chưa ghi nhận", note: "Con Ông Hiền" }
+    const romanGens = ["", "Đời thứ I", "Đời thứ II", "Đời thứ III", "Đời thứ IV", "Đời thứ V", "Đời thứ VI", "Đời thứ VII"];
+
+    // HÀM XÁC ĐỊNH CHỮ "VỢ" HOẶC "CHỒNG" CHUẨN XÁC THEO GIỚI TÍNH
+    function getSpouseLabel(name) {
+      const n = (name || '').toUpperCase();
+      if (n.includes('THỊ') || n.includes('BÀ ')) return 'Chồng';
+      return 'Vợ';
+    }
+
+    // 186 THÀNH VIÊN ĐẦY ĐỦ TRÍCH XUẤT TỪ FILE EXCEL
+    const rawData = [
+      {"id": 1, "name": "CỤ TIẾU", "gen": 1, "spouse": "VŨ THỊ HÀNG", "parentId": null, "deathDay": 15, "deathMonth": 1, "deathText": "Rằm tháng Giêng (15 tháng Giêng Âm lịch)"},
+      {"id": 2, "name": "PHẠM HÚY TÁM", "gen": 2, "spouse": "", "parentId": 1, "deathDay": 10, "deathMonth": 3, "deathText": "10 tháng 3 Âm lịch"},
+      {"id": 3, "name": "PHẠM HÚY BÉ", "gen": 2, "spouse": "", "parentId": 1},
+      {"id": 4, "name": "PHẠM VĂN TẮC", "gen": 2, "spouse": "LÊ THỊ LIÊN", "parentId": 1, "deathDay": 22, "deathMonth": 6, "deathText": "22 tháng 6 Âm lịch"},
+      {"id": 5, "name": "PHẠM HÚY ÚT", "gen": 2, "spouse": "", "parentId": 1},
+      {"id": 6, "name": "PHẠM HÚY NGÂN", "gen": 2, "spouse": "", "parentId": 1, "deathDay": 18, "deathMonth": 4, "deathText": "18 tháng 4 Âm lịch"},
+      {"id": 7, "name": "PHẠM HÚY NHỠ", "gen": 2, "spouse": "", "parentId": 1},
+      {"id": 8, "name": "PHẠM VĂN TỐC", "gen": 2, "spouse": "TRẦN THỊ KHÁI, NGUYỄN THỊ NHỊ, LÊ THỊ TAM", "parentId": 1, "deathDay": 5, "deathMonth": 9, "deathText": "05 tháng 9 Âm lịch"},
+      {"id": 9, "name": "PHẠM HÚY PIU", "gen": 2, "spouse": "", "parentId": 1},
+      {"id": 10, "name": "PHẠM HÚY TIẾU", "gen": 2, "spouse": "", "parentId": 1},
+      {"id": 11, "name": "PHẠM HÚY RỘNG", "gen": 3, "spouse": "", "parentId": 4, "deathDay": 12, "deathMonth": 10, "deathText": "12 tháng 10 Âm lịch"},
+      {"id": 12, "name": "PHẠM VĂN TẶNG", "gen": 3, "spouse": "TRỊNH THỊ THẮM, CAO THỊ THÔNG", "parentId": 4, "deathDay": 2, "deathMonth": 11, "deathText": "02 tháng 11 Âm lịch"},
+      {"id": 13, "name": "PHẠM THỊ ÊM", "gen": 3, "spouse": "", "parentId": 4},
+      {"id": 14, "name": "PHẠM HÚY ÁI", "gen": 3, "spouse": "", "parentId": 4},
+      {"id": 15, "name": "PHẠM HÚY HỘT", "gen": 3, "spouse": "", "parentId": 4},
+      {"id": 16, "name": "PHẠM HÚY TRÒN", "gen": 3, "spouse": "", "parentId": 4},
+      {"id": 17, "name": "PHẠM THỊ KHÁNG", "gen": 3, "spouse": "PHẠM VĂN NHUẬN", "parentId": 8},
+      {"id": 18, "name": "PHẠM VĂN THÚC", "gen": 3, "spouse": "PHẠM THỊ NỞ", "parentId": 8},
+      {"id": 19, "name": "PHẠM VĂN TIÊU", "gen": 3, "spouse": "HOÀNG THỊ XỚN", "parentId": 8},
+      {"id": 20, "name": "PHẠM VĂN TỨ", "gen": 4, "spouse": "PHẠM THỊ MÙI, MAI THỊ CẬY", "parentId": 12, "deathDay": 14, "deathMonth": 7, "deathText": "14 tháng 7 Âm lịch"},
+      {"id": 21, "name": "PHẠM VĂN RU", "gen": 4, "spouse": "LÊ THỊ HOA, NGUYỄN THỊ CHẮT", "parentId": 12},
+      {"id": 22, "name": "PHẠM HÚY RUY", "gen": 4, "spouse": "", "parentId": 12},
+      {"id": 23, "name": "PHẠM THỊ PHƯƠNG", "gen": 4, "spouse": "", "parentId": 12},
+      {"id": 24, "name": "PHẠM VĂN VŨ", "gen": 4, "spouse": "HOÀNG THỊ HÀ TÂM", "parentId": 12},
+      {"id": 25, "name": "PHẠM THỊ", "gen": 4, "spouse": "", "parentId": 12},
+      {"id": 26, "name": "PHẠM VĂN BÁU", "gen": 4, "spouse": "TRẦN THỊ TỐT", "parentId": 12},
+      {"id": 27, "name": "PHẠM HÚY NGẮN", "gen": 4, "spouse": "", "parentId": 12},
+      {"id": 28, "name": "PHẠM HÚY SÒI", "gen": 4, "spouse": "", "parentId": 12},
+      {"id": 29, "name": "PHẠM HÚY QUÝ", "gen": 4, "spouse": "", "parentId": 12},
+      {"id": 30, "name": "ÔNG SÁCH", "gen": 4, "spouse": "NGUYỄN THỊ NGHẢI", "parentId": 18},
+      {"id": 31, "name": "PHẠM HÚY THÍN", "gen": 4, "spouse": "", "parentId": 18},
+      {"id": 32, "name": "BÀ LÂM", "gen": 4, "spouse": "", "parentId": 18},
+      {"id": 33, "name": "BÀ CHU", "gen": 4, "spouse": "", "parentId": 18},
+      {"id": 34, "name": "ÔNG Y", "gen": 4, "spouse": "", "parentId": 18},
+      {"id": 35, "name": "ÔNG Ý", "gen": 4, "spouse": "NGUYỄN THỊ ĐÀO", "parentId": 18},
+      {"id": 36, "name": "BÀ HOA", "gen": 4, "spouse": "", "parentId": 18},
+      {"id": 37, "name": "BÀ HỒNG", "gen": 4, "spouse": "", "parentId": 18},
+      {"id": 38, "name": "BÀ SỢI", "gen": 4, "spouse": "", "parentId": 18},
+      {"id": 39, "name": "ÔNG TUYỂN", "gen": 4, "spouse": "", "parentId": 18},
+      {"id": 40, "name": "PHẠM HÚY TỐN", "gen": 4, "spouse": "", "parentId": 19},
+      {"id": 41, "name": "BÀ TƠ", "gen": 4, "spouse": "", "parentId": 19},
+      {"id": 42, "name": "BÀ LÀ", "gen": 4, "spouse": "", "parentId": 19},
+      {"id": 43, "name": "BÀ LƯỢT", "gen": 4, "spouse": "", "parentId": 19},
+      {"id": 44, "name": "ÔNG PHÙNG", "gen": 4, "spouse": "", "parentId": 19},
+      {"id": 45, "name": "ÔNG CHU", "gen": 4, "spouse": "", "parentId": 19},
+      {"id": 46, "name": "ÔNG TIẾN", "gen": 4, "spouse": "", "parentId": 19},
+      {"id": 47, "name": "BÀ THE", "gen": 4, "spouse": "", "parentId": 19},
+      {"id": 48, "name": "PHẠM VĂN HIỀN", "gen": 5, "spouse": "", "parentId": 20},
+      {"id": 49, "name": "PHẠM VĂN HIỂN", "gen": 5, "spouse": "", "parentId": 20},
+      {"id": 50, "name": "PHẠM THỊ HÒA", "gen": 5, "spouse": "", "parentId": 20},
+      {"id": 51, "name": "PHẠM THỊ HỢP", "gen": 5, "spouse": "", "parentId": 20},
+      {"id": 52, "name": "PHẠM HÚY CHẮT", "gen": 5, "spouse": "", "parentId": 20},
+      {"id": 53, "name": "PHẠM THỊ THANH", "gen": 5, "spouse": "", "parentId": 21},
+      {"id": 54, "name": "PHẠM THỊ CẬY", "gen": 5, "spouse": "", "parentId": 21},
+      {"id": 55, "name": "PHẠM THỊ XUYẾN", "gen": 5, "spouse": "", "parentId": 21},
+      {"id": 56, "name": "PHẠM VĂN DOANH", "gen": 5, "spouse": "BÀ THANH", "parentId": 21},
+      {"id": 57, "name": "PHẠM VĂN RUỆ", "gen": 5, "spouse": "", "parentId": 21},
+      {"id": 58, "name": "PHẠM VĂN ĐỆ", "gen": 5, "spouse": "", "parentId": 21},
+      {"id": 59, "name": "PHẠM VĂN HƯNG", "gen": 5, "spouse": "", "parentId": 21},
+      {"id": 60, "name": "PHẠM THỊ HƯỜNG", "gen": 5, "spouse": "", "parentId": 24},
+      {"id": 61, "name": "PHẠM THỊ HÀ", "gen": 5, "spouse": "", "parentId": 24},
+      {"id": 62, "name": "PHẠM VĂN HÙNG", "gen": 5, "spouse": "", "parentId": 24},
+      {"id": 63, "name": "PHẠM THỊ ANH", "gen": 5, "spouse": "", "parentId": 24},
+      {"id": 64, "name": "PHẠM VĂN CƯỜNG", "gen": 5, "spouse": "", "parentId": 24},
+      {"id": 65, "name": "PHẠM VĂN LÂM", "gen": 5, "spouse": "", "parentId": 26},
+      {"id": 66, "name": "PHẠM THỊ LIỄU", "gen": 5, "spouse": "", "parentId": 26},
+      {"id": 67, "name": "PHẠM THỊ ĐÔNG", "gen": 5, "spouse": "", "parentId": 26},
+      {"id": 68, "name": "PHẠM THỊ NHÀNG", "gen": 5, "spouse": "", "parentId": 26},
+      {"id": 69, "name": "PHẠM VĂN TRƯỜNG", "gen": 5, "spouse": "", "parentId": 26},
+      {"id": 70, "name": "PHẠM THỊ ĐÀO", "gen": 5, "spouse": "", "parentId": 26},
+      {"id": 71, "name": "PHẠM VĂN TOÀN", "gen": 5, "spouse": "", "parentId": 26},
+      {"id": 72, "name": "PHẠM VĂN HUẤN", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 73, "name": "PHẠM THỊ THOA", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 74, "name": "PHẠM THỊ THÊU", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 75, "name": "PHẠM VĂN BÚT", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 76, "name": "PHẠM THỊ GẤM", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 77, "name": "PHẠM THỊ THỦY", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 78, "name": "PHẠM VĂN NGHIÊM", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 79, "name": "PHẠM THỊ THU", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 80, "name": "PHẠM THỊ ĐÔNG", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 81, "name": "PHẠM VĂN NGHI", "gen": 5, "spouse": "", "parentId": 30},
+      {"id": 82, "name": "PHẠM VĂN ĐÌNH", "gen": 5, "spouse": "", "parentId": 34},
+      {"id": 83, "name": "PHẠM VĂN QUỲNH", "gen": 5, "spouse": "", "parentId": 34},
+      {"id": 84, "name": "PHẠM THỊ LIN", "gen": 5, "spouse": "", "parentId": 34},
+      {"id": 85, "name": "PHẠM THỊ LEN", "gen": 5, "spouse": "", "parentId": 34},
+      {"id": 86, "name": "PHẠM THỊ LOAN", "gen": 5, "spouse": "", "parentId": 34},
+      {"id": 87, "name": "PHẠM THỊ LIỄU", "gen": 5, "spouse": "", "parentId": 34},
+      {"id": 88, "name": "PHẠM THỊ LUYẾN", "gen": 5, "spouse": "", "parentId": 34},
+      {"id": 89, "name": "PHẠM THỊ LỊU", "gen": 5, "spouse": "", "parentId": 34},
+      {"id": 90, "name": "PHẠM THỊ PHẤN", "gen": 5, "spouse": "", "parentId": 34},
+      {"id": 91, "name": "PHẠM VĂN ĐỊNH", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 92, "name": "PHẠM VĂN TRÌNH", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 93, "name": "PHẠM THỊ LUYẾN", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 94, "name": "PHẠM THỊ THANH", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 95, "name": "PHẠM VĂN NHÂN", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 96, "name": "PHẠM THỊ KHUYÊN", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 97, "name": "PHẠM THỊ NHẪN", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 98, "name": "PHẠM VĂN KHƯƠNG", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 99, "name": "PHẠM THỊ MẾN", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 100, "name": "PHẠM VĂN SÁNG", "gen": 5, "spouse": "", "parentId": 35},
+      {"id": 101, "name": "PHẠM THỊ RỊU", "gen": 5, "spouse": "", "parentId": 39},
+      {"id": 102, "name": "PHẠM THỊ RÁY", "gen": 5, "spouse": "", "parentId": 39},
+      {"id": 103, "name": "PHẠM THỊ TUYẾT", "gen": 5, "spouse": "", "parentId": 39},
+      {"id": 104, "name": "PHẠM THỊ RƯƠNG", "gen": 5, "spouse": "", "parentId": 39},
+      {"id": 105, "name": "PHẠM THỊ RINH", "gen": 5, "spouse": "", "parentId": 39},
+      {"id": 106, "name": "PHẠM VĂN ĐỒNG", "gen": 5, "spouse": "", "parentId": 39},
+      {"id": 107, "name": "PHẠM THỊ TRINH", "gen": 5, "spouse": "", "parentId": 39},
+      {"id": 108, "name": "PHẠM VĂN HÀN", "gen": 5, "spouse": "", "parentId": 39},
+      {"id": 109, "name": "PHẠM VĂN LUẬN", "gen": 5, "spouse": "", "parentId": 44},
+      {"id": 110, "name": "PHẠM THỊ PHƯỢNG", "gen": 5, "spouse": "", "parentId": 44},
+      {"id": 111, "name": "PHẠM THỊ NGÂN", "gen": 5, "spouse": "", "parentId": 44},
+      {"id": 112, "name": "PHẠM THỊ THUẬN", "gen": 5, "spouse": "", "parentId": 44},
+      {"id": 113, "name": "PHẠM THỊ THẢO", "gen": 5, "spouse": "", "parentId": 44},
+      {"id": 114, "name": "PHẠM VĂN HIỆP", "gen": 5, "spouse": "", "parentId": 45},
+      {"id": 115, "name": "PHẠM VĂN HIẾU", "gen": 5, "spouse": "", "parentId": 45},
+      {"id": 116, "name": "PHẠM VĂN HẬU", "gen": 5, "spouse": "", "parentId": 45},
+      {"id": 117, "name": "PHẠM THỊ THU", "gen": 5, "spouse": "", "parentId": 45},
+      {"id": 118, "name": "PHẠM VĂN CÔNG", "gen": 5, "spouse": "", "parentId": 46},
+      {"id": 119, "name": "PHẠM VĂN ĐÍNH", "gen": 5, "spouse": "", "parentId": 46},
+      {"id": 120, "name": "PHẠM VĂN HƯỚNG", "gen": 5, "spouse": "", "parentId": 46},
+      {"id": 121, "name": "PHẠM THỊ NHÀI", "gen": 5, "spouse": "", "parentId": 46},
+      {"id": 122, "name": "PHẠM THỊ NHUNG", "gen": 5, "spouse": "", "parentId": 46},
+      {"id": 123, "name": "PHẠM VĂN DŨNG (1969)", "gen": 6, "spouse": "HOÀNG THỊ HẢO (1973)", "parentId": 48},
+      {"id": 124, "name": "PHẠM VĂN DƯƠNG", "gen": 6, "spouse": "NGUYỄN THỊ OANH", "parentId": 48},
+      {"id": 125, "name": "PHẠM VĂN ĐĂNG", "gen": 6, "spouse": "NGUYỄN THỊ HOA", "parentId": 48},
+      {"id": 126, "name": "PHẠM VĂN RƯ", "gen": 6, "spouse": "DUYÊN", "parentId": 56},
+      {"id": 127, "name": "PHẠM VĂN RẬT", "gen": 6, "spouse": "", "parentId": 56},
+      {"id": 128, "name": "PHẠM VĂN SƠN (1990)", "gen": 6, "spouse": "HƯƠNG (1988)", "parentId": 58},
+      {"id": 129, "name": "PHẠM TRỌNG HIỆP", "gen": 6, "spouse": "", "parentId": 58},
+      {"id": 130, "name": "PHẠM THỊ KHUY", "gen": 6, "spouse": "", "parentId": 59},
+      {"id": 131, "name": "PHẠM VĂN HÀ", "gen": 6, "spouse": "", "parentId": 59},
+      {"id": 132, "name": "PHẠM VĂN HUYẾN", "gen": 6, "spouse": "", "parentId": 59},
+      {"id": 133, "name": "PHẠM NGỌC THAO (1993)", "gen": 6, "spouse": "", "parentId": 65},
+      {"id": 134, "name": "PHẠM NGỌC THỂ (1995)", "gen": 6, "spouse": "", "parentId": 65},
+      {"id": 135, "name": "PHẠM THỊ LINH", "gen": 6, "spouse": "", "parentId": 71},
+      {"id": 136, "name": "PHẠM VĂN PHI", "gen": 6, "spouse": "", "parentId": 71},
+      {"id": 137, "name": "PHẠM VĂN VĂN", "gen": 6, "spouse": "", "parentId": 75},
+      {"id": 138, "name": "PHẠM THỊ HƯỜNG", "gen": 6, "spouse": "", "parentId": 75},
+      {"id": 139, "name": "PHẠM VĂN TÍNH", "gen": 6, "spouse": "", "parentId": 75},
+      {"id": 140, "name": "PHẠM VĂN TOÁN", "gen": 6, "spouse": "", "parentId": 75},
+      {"id": 141, "name": "PHẠM THỊ LEN", "gen": 6, "spouse": "", "parentId": 78},
+      {"id": 142, "name": "PHẠM VĂN LIỆU", "gen": 6, "spouse": "", "parentId": 78},
+      {"id": 143, "name": "PHẠM VĂN SƠN", "gen": 6, "spouse": "", "parentId": 82},
+      {"id": 144, "name": "PHẠM THỊ", "gen": 6, "spouse": "", "parentId": 82},
+      {"id": 145, "name": "PHẠM VĂN SĨ", "gen": 6, "spouse": "", "parentId": 83},
+      {"id": 146, "name": "PHẠM THỊ LUYỆN", "gen": 6, "spouse": "", "parentId": 84},
+      {"id": 147, "name": "PHẠM THỊ KHÁNH", "gen": 6, "spouse": "", "parentId": 84},
+      {"id": 148, "name": "PHẠM THỊ HƯNG", "gen": 6, "spouse": "", "parentId": 84},
+      {"id": 149, "name": "PHẠM VĂN VI", "gen": 6, "spouse": "", "parentId": 91},
+      {"id": 150, "name": "PHẠM VĂN KẾT", "gen": 6, "spouse": "", "parentId": 91},
+      {"id": 151, "name": "PHẠM THỊ NHI", "gen": 6, "spouse": "", "parentId": 92},
+      {"id": 152, "name": "PHẠM VĂN CỦA", "gen": 6, "spouse": "", "parentId": 92},
+      {"id": 153, "name": "PHẠM VĂN PHƯƠNG", "gen": 6, "spouse": "", "parentId": 95},
+      {"id": 154, "name": "PHẠM THỊ THẢO", "gen": 6, "spouse": "", "parentId": 95},
+      {"id": 155, "name": "PHẠM THỊ DƯƠNG", "gen": 6, "spouse": "", "parentId": 95},
+      {"id": 156, "name": "PHẠM VĂN BẢO", "gen": 6, "spouse": "", "parentId": 100},
+      {"id": 157, "name": "PHẠM THỊ DIỄM", "gen": 6, "spouse": "", "parentId": 100},
+      {"id": 158, "name": "PHẠM VĂN ĐẠT", "gen": 6, "spouse": "", "parentId": 106},
+      {"id": 159, "name": "PHẠM MINH THƯ", "gen": 6, "spouse": "", "parentId": 106},
+      {"id": 160, "name": "PHẠM ANH THƯ", "gen": 6, "spouse": "", "parentId": 106},
+      {"id": 161, "name": "PHẠM VĂN ANH", "gen": 6, "spouse": "", "parentId": 108},
+      {"id": 162, "name": "PHẠM VĂN KIÊN", "gen": 6, "spouse": "", "parentId": 108},
+      {"id": 163, "name": "PHẠM VĂN ANH", "gen": 6, "spouse": "", "parentId": 109},
+      {"id": 164, "name": "PHẠM THỊ LINH", "gen": 6, "spouse": "", "parentId": 109},
+      {"id": 165, "name": "PHẠM THỊ CHI", "gen": 6, "spouse": "", "parentId": 109},
+      {"id": 166, "name": "PHẠM VĂN PHÚ", "gen": 6, "spouse": "", "parentId": 114},
+      {"id": 167, "name": "PHẠM THỊ TOAN", "gen": 6, "spouse": "", "parentId": 114},
+      {"id": 168, "name": "PHẠM THỊ NGỌC", "gen": 6, "spouse": "", "parentId": 115},
+      {"id": 169, "name": "PHẠM THỊ ANH", "gen": 6, "spouse": "", "parentId": 115},
+      {"id": 170, "name": "PHẠM VĂN QUÂN", "gen": 6, "spouse": "", "parentId": 116},
+      {"id": 171, "name": "PHẠM VĂN ĐẠT", "gen": 6, "spouse": "", "parentId": 116},
+      {"id": 172, "name": "PHẠM VĂN HOÀNG", "gen": 6, "spouse": "", "parentId": 118},
+      {"id": 173, "name": "PHẠM VĂN PHONG", "gen": 6, "spouse": "", "parentId": 118},
+      {"id": 174, "name": "PHẠM VĂN VINH", "gen": 6, "spouse": "", "parentId": 119},
+      {"id": 175, "name": "PHẠM THỊ HUẾ (1992)", "gen": 7, "spouse": "NGUYỄN ĐỨC HẢI (1986)", "parentId": 123},
+      {"id": 176, "name": "PHẠM THỊ QUẾ (1994)", "gen": 7, "spouse": "TRẦN VĂN TẤN (1990)", "parentId": 123},
+      {"id": 177, "name": "PHẠM ĐÌNH THIÊM (1999)", "gen": 7, "spouse": "", "parentId": 123},
+      {"id": 178, "name": "PHẠM THỊ ÁNH (1998)", "gen": 7, "spouse": "CAO QUANG HƯỚNG (1993)", "parentId": 124},
+      {"id": 179, "name": "PHẠM ĐÌNH TUYÊN (2004)", "gen": 7, "spouse": "", "parentId": 124},
+      {"id": 180, "name": "PHẠM VĂN DANH (2004)", "gen": 7, "spouse": "", "parentId": 125},
+      {"id": 181, "name": "PHẠM LINH ĐAN (2011)", "gen": 7, "spouse": "", "parentId": 125},
+      {"id": 182, "name": "PHẠM VĂN HUY", "gen": 7, "spouse": "", "parentId": 126},
+      {"id": 183, "name": "PHẠM VĂN NAM", "gen": 7, "spouse": "", "parentId": 126},
+      {"id": 184, "name": "PHẠM THỊ CHÂU", "gen": 7, "spouse": "", "parentId": 126},
+      {"id": 185, "name": "PHẠM THỊ TRÂM", "gen": 7, "spouse": "", "parentId": 129},
+      {"id": 186, "name": "PHẠM THỊ VY", "gen": 7, "spouse": "", "parentId": 129}
     ];
 
-    const romanGens = ["", "Đời thứ I", "Đời thứ II", "Đời thứ III", "Đời thứ IV", "Đời thứ V", "Đời thứ VI"];
+    // Tạo bản đồ dữ liệu và con cái
+    const memberMap = {};
+    rawData.forEach(m => { memberMap[m.id] = { ...m, children: [] }; });
+    rawData.forEach(m => {
+      if (m.parentId && memberMap[m.parentId]) {
+        memberMap[m.parentId].children.push(memberMap[m.id]);
+      }
+    });
 
-    // Render danh sách theo từng đời
+    // Đệ quy dựng Sơ Đồ Cây (Hiển thị rõ "Vợ:" hoặc "Chồng:")
+    function renderTreeHTML(node) {
+      const childCount = node.children.length;
+      const countLabel = childCount > 0 ? `${childCount} người con` : "0";
+      const sLabel = getSpouseLabel(node.name);
+      const spouseHtml = node.spouse ? `<div class="spouse-name">${sLabel}: ${node.spouse}</div>` : '';
+
+      let html = `
+        <li>
+          <div class="member-card" id="card-${node.id}" onclick="selectMember(${node.id}, event)">
+            <span class="marker-badge">📍 Đang chọn</span>
+            <span class="gen-badge">${romanGens[node.gen]}</span>
+            <div class="member-name">${node.name}</div>
+            ${spouseHtml}
+            <div class="children-count">${countLabel}</div>
+          </div>
+      `;
+
+      if (childCount > 0) {
+        html += `<ul>`;
+        node.children.forEach(child => { html += renderTreeHTML(child); });
+        html += `</ul>`;
+      }
+
+      html += `</li>`;
+      return html;
+    }
+
+    document.getElementById('treeRootContainer').innerHTML = `<ul>${renderTreeHTML(memberMap[1])}</ul>`;
+
+    // Render Chế độ Danh Sách Các Đời (Hiển thị rõ "Vợ:" hoặc "Chồng:")
     function renderListMode() {
       const container = document.getElementById('listMode');
       let html = '';
-      for (let g = 1; g <= 6; g++) {
-        const groupMembers = members.filter(m => m.gen === g);
+      for (let g = 1; g <= 7; g++) {
+        const groupMembers = rawData.filter(m => m.gen === g);
         if (groupMembers.length === 0) continue;
         html += `
           <div class="gen-group">
@@ -583,12 +632,15 @@
               <span style="font-size:12px; font-weight:normal; opacity:0.8;">${groupMembers.length} thành viên</span>
             </div>
             <div class="gen-member-grid">
-              ${groupMembers.map(m => `
-                <div class="list-card" onclick="openDetailsById(${m.id})">
-                  <div class="list-card-name">${m.name}</div>${m.spouse !== "Chưa ghi nhận" ? `<div class="list-card-spouse">Phối ngẫu: ${m.spouse}</div>` : ''}
-                  <div class="list-card-badge">${m.childrenCount}</div>
+              ${groupMembers.map(m => {
+                const sLabel = getSpouseLabel(m.name);
+                return `
+                <div class="list-card" onclick="selectMember(${m.id})">
+                  <div class="list-card-name">${m.name}</div>${m.spouse ? `<div class="list-card-spouse">${sLabel}: ${m.spouse}</div>` : ''}
+                  <div class="list-card-badge">${memberMap[m.id].children.length} người con</div>
+                  ${m.deathDay ? `<div style="font-size:11px; color:#c53030; margin-top:4px;">Giỗ: ${m.deathText}</div>` : ''}
                 </div>
-              `).join('')}
+              `;}).join('')}
             </div>
           </div>
         `;
@@ -596,43 +648,279 @@
       container.innerHTML = html;
     }
 
-    // Chuyển chế độ xem: 'list' (di động) hoặc 'tree' (sơ đồ cây)
-    let currentZoom = 1;
-    function switchView(mode) {
+    // Chuyển đổi tab xem Cây / Danh sách
+    function switchView(mode, skipReset) {
       const listEl = document.getElementById('listMode');
-      const treeEl = document.getElementById('treeMode');
-      const treeTools = document.getElementById('treeTools');
+      const treeEl = document.getElementById('treeCanvas');
       const btnList = document.getElementById('btnList');
       const btnTree = document.getElementById('btnTree');
 
       if (mode === 'tree') {
         listEl.style.display = 'none';
         treeEl.style.display = 'block';
-        treeTools.style.display = 'flex';
         btnTree.classList.add('active');
         btnList.classList.remove('active');
+        if (!skipReset) setTimeout(resetToCenter, 50);
       } else {
         listEl.style.display = 'block';
         treeEl.style.display = 'none';
-        treeTools.style.display = 'none';
         btnList.classList.add('active');
         btnTree.classList.remove('active');
       }
     }
 
-    // Phóng to / Thu nhỏ Sơ Đồ Cây
-    function zoomTree(delta) {
-      currentZoom = Math.min(Math.max(0.4, currentZoom + delta), 1.8);
-      document.getElementById('treeViewport').style.transform = `scale(${currentZoom})`;
+    /* Thuật toán Âm Lịch Thiên Văn Việt Nam */
+    function jdFromDate(dd, mm, yy) {
+      let a = Math.floor((14 - mm) / 12);
+      let y = yy + 4800 - a;
+      let m = mm + 12 * a - 3;
+      return dd + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
     }
-    function resetZoom() {
-      currentZoom = 1;
-      document.getElementById('treeViewport').style.transform = 'scale(1)';
+    function getNewMoonDay(k, timeZone = 7.0) {
+      let T = k / 1236.85; let T2 = T * T; let T3 = T2 * T; let dr = Math.PI / 180;
+      let Jd1 = 2415020.75933 + 29.53058868 * k + 0.0001178 * T2 - 0.000000155 * T3;
+      Jd1 += 0.00033 * Math.sin((166.56 + 132.87 * T - 0.009173 * T2) * dr);
+      let M = 359.2242 + 29.10535608 * k - 0.0000333 * T2 - 0.00000347 * T3;
+      let Mpr = 306.0253 + 385.81691806 * k + 0.0107306 * T2 + 0.00001236 * T3;
+      let F = 21.2964 + 390.67050646 * k - 0.0016528 * T2 - 0.00000239 * T3;
+      C1 = (0.1734 - 0.000393 * T) * Math.sin(M * dr) + 0.0021 * Math.sin(2 * dr * M);
+      C1 -= 0.4068 * Math.sin(Mpr * dr) + 0.0161 * Math.sin(2 * dr * Mpr);
+      C1 -= 0.0004 * Math.sin(3 * dr * Mpr);
+      C1 += 0.0104 * Math.sin(2 * dr * F) - 0.0051 * Math.sin((M + Mpr) * dr);
+      C1 -= 0.0074 * Math.sin((M - Mpr) * dr) + 0.0004 * Math.sin((2 * F + M) * dr);
+      C1 -= 0.0004 * Math.sin((2 * F - M) * dr) - 0.0006 * Math.sin((2 * F + Mpr) * dr);
+      C1 += 0.0010 * Math.sin((2 * F - Mpr) * dr) + 0.0005 * Math.sin((2 * Mpr + M) * dr);
+      return Math.floor(Jd1 + C1 + 0.5 + timeZone / 24.0);
+    }
+    function getSunLongitude(dayNumber, timeZone = 7.0) {
+      let T = (dayNumber - 2451545.5 - timeZone / 24.0) / 36525.0;
+      let T2 = T * T; let dr = Math.PI / 180;
+      let M = 357.52910 + 35999.05030 * T - 0.0001559 * T2 - 0.00000048 * T * T2;
+      let L0 = 280.46645 + 36000.76983 * T + 0.0003032 * T2;
+      let DL = (1.914600 - 0.004817 * T - 0.000014 * T2) * Math.sin(dr * M);
+      DL += (0.019993 - 0.000101 * T) * Math.sin(dr * 2 * M) + 0.000290 * Math.sin(dr * 3 * M);
+      let L = (L0 + DL) * dr; L = L - Math.PI * 2 * Math.floor(L / (Math.PI * 2));
+      return Math.floor(L / (Math.PI / 6));
+    }
+    function getLunarMonth11(yy, timeZone = 7.0) {
+      let off = jdFromDate(31, 12, yy) - 2415021; let k = Math.floor(off / 29.530588853);
+      let nm = getNewMoonDay(k, timeZone); let sunLong = getSunLongitude(nm, timeZone);
+      if (sunLong >= 9) nm = getNewMoonDay(k - 1, timeZone);
+      return nm;
+    }
+    function getLeapMonthOffset(a11, timeZone = 7.0) {
+      let k = Math.floor((a11 - 2415021.076998695) / 29.530588853 + 0.5);
+      let last = 0, i = 1; let arc = getSunLongitude(getNewMoonDay(k + i, timeZone), timeZone);
+      while (true) {
+        last = arc; i++; arc = getSunLongitude(getNewMoonDay(k + i, timeZone), timeZone);
+        if (arc === last || i >= 14) break;
+      }
+      return i - 1;
+    }
+    function convertSolar2Lunar(dd, mm, yy, timeZone = 7.0) {
+      let dayNumber = jdFromDate(dd, mm, yy);
+      let k = Math.floor((dayNumber - 2415021.076998695) / 29.530588853);
+      let monthStart = getNewMoonDay(k + 1, timeZone);
+      if (monthStart > dayNumber) monthStart = getNewMoonDay(k, timeZone);
+      let a11 = getLunarMonth11(yy, timeZone); let b11 = a11; let lunarYear = yy;
+      if (a11 >= monthStart) { lunarYear = yy; a11 = getLunarMonth11(yy - 1, timeZone); }
+      else { lunarYear = yy + 1; b11 = getLunarMonth11(yy + 1, timeZone); }
+      let lunarDay = dayNumber - monthStart + 1;
+      let diff = Math.floor((monthStart - a11) / 29);
+      let lunarMonth = diff + 11;
+      if ((b11 - a11) > 365) {
+        let leapOff = getLeapMonthOffset(a11, timeZone);
+        if (diff >= leapOff) lunarMonth = diff + 10;
+      }
+      if (lunarMonth > 12) lunarMonth -= 12;
+      if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
+      return { day: lunarDay, month: lunarMonth, year: lunarYear };
     }
 
-    // Xử lý Tìm kiếm & Lọc
+    function updateLunarAndAnniversary() {
+      const now = new Date();
+      const lDate = convertSolar2Lunar(now.getDate(), now.getMonth() + 1, now.getFullYear());
+      document.getElementById('currentLunarDate').innerText = `${lDate.day} tháng ${lDate.month} năm ${lDate.year} Âm lịch`;
+
+      let upcoming = null;
+      let minDiffDays = 9999;
+
+      rawData.forEach(m => {
+        if (m.deathDay && m.deathMonth) {
+          let currentPos = lDate.month * 30 + lDate.day;
+          let targetPos = m.deathMonth * 30 + m.deathDay;
+          let diff = targetPos - currentPos;
+          if (diff < 0) diff += 354;
+          if (diff < minDiffDays) {
+            minDiffDays = diff;
+            upcoming = { member: m, daysLeft: diff };
+          }
+        }
+      });
+
+      const annivLine = document.getElementById('nextAnnivLine');
+      if (upcoming) {
+        let timeStr = upcoming.daysLeft === 0 ? "Hôm nay chính giỗ" : `còn khoảng ${upcoming.daysLeft} ngày`;
+        annivLine.innerHTML = `
+          Ngày giỗ gần nhất: <span class="anniv-person-tag">${upcoming.member.name}</span> (${romanGens[upcoming.member.gen]}) 
+          vào ngày <strong>${upcoming.member.deathDay} tháng ${upcoming.member.deathMonth} Âm lịch</strong> 
+          <span class="anniv-days-tag">(${timeStr})</span>
+          <button class="btn-quick-find" onclick="selectMember(${upcoming.member.id})">🔍 Xem trên sơ đồ</button>
+        `;
+      } else {
+        annivLine.innerText = "Chưa có thông tin ngày giỗ cận kề.";
+      }
+    }
+
+    /* ========================================================================= */
+    /* HỆ THỐNG PAN & ZOOM MƯỢT MÀ TẠI ĐIỂM CHẠM CẢM ỨNG (TOUCH FOCAL ZOOM)      */
+    /* ========================================================================= */
+    const canvas = document.getElementById('treeCanvas');
+    const container = document.getElementById('panContainer');
+    let scale = 0.85;
+    let pointX = 0, pointY = 0;
+    let isPanning = false;
+    let startX = 0, startY = 0;
+
+    let prevTouchDist = null;
+    let prevTouchMidX = 0, prevTouchMidY = 0;
+
+    function applyTransform() {
+      container.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+    }
+
+    // Chuột kéo (Mouse Pan)
+    canvas.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.member-card') || e.target.closest('.zoom-controls')) return;
+      isPanning = true;
+      startX = e.clientX - pointX;
+      startY = e.clientY - pointY;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isPanning) return;
+      pointX = e.clientX - startX;
+      pointY = e.clientY - startY;
+      applyTransform();
+    });
+    window.addEventListener('mouseup', () => { isPanning = false; });
+
+    // Cuộn chuột phóng to/thu nhỏ tại con trỏ chuột
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const factor = e.deltaY < 0 ? 1.12 : 0.89;
+      const newScale = Math.min(Math.max(0.15, scale * factor), 2.5);
+      pointX = mouseX - (mouseX - pointX) * (newScale / scale);
+      pointY = mouseY - (mouseY - pointY) * (newScale / scale);
+      scale = newScale;
+      applyTransform();
+    }, { passive: false });
+
+    // CẢM ỨNG ĐIỆN THOẠI: 1 NGÓN VUỐT PAN, 2 NGÓN CHỤM/MỞ ZOOM MƯỢT MÀ TẠI TÂM CHẠM
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        if (e.target.closest('.member-card') || e.target.closest('.zoom-controls')) return;
+        isPanning = true;
+        startX = e.touches[0].clientX - pointX;
+        startY = e.touches[0].clientY - pointY;
+      } else if (e.touches.length === 2) {
+        isPanning = false;
+        const rect = canvas.getBoundingClientRect();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        prevTouchDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        prevTouchMidX = (t1.clientX + t2.clientX) / 2 - rect.left;
+        prevTouchMidY = (t1.clientY + t2.clientY) / 2 - rect.top;
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (isPanning && e.touches.length === 1) {
+        pointX = e.touches[0].clientX - startX;
+        pointY = e.touches[0].clientY - startY;
+        applyTransform();
+      } else if (e.touches.length === 2 && prevTouchDist) {
+        const rect = canvas.getBoundingClientRect();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const currentMidX = (t1.clientX + t2.clientX) / 2 - rect.left;
+        const currentMidY = (t1.clientY + t2.clientY) / 2 - rect.top;
+
+        if (prevTouchDist > 0 && currentDist > 0) {
+          const deltaZoom = currentDist / prevTouchDist;
+          const newScale = Math.min(Math.max(0.15, scale * deltaZoom), 2.5);
+          const actualRatio = newScale / scale;
+
+          pointX = currentMidX - (currentMidX - pointX) * actualRatio + (currentMidX - prevTouchMidX);
+          pointY = currentMidY - (currentMidY - pointY) * actualRatio + (currentMidY - prevTouchMidY);
+          scale = newScale;
+
+          prevTouchDist = currentDist;
+          prevTouchMidX = currentMidX;
+          prevTouchMidY = currentMidY;
+          applyTransform();
+        }
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', () => {
+      isPanning = false;
+      prevTouchDist = null;
+    });
+
+    function zoomAction(factor) {
+      const rect = canvas.getBoundingClientRect();
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const newScale = Math.min(Math.max(0.15, scale * factor), 2.5);
+      pointX = centerX - (centerX - pointX) * (newScale / scale);
+      pointY = centerY - (centerY - pointY) * (newScale / scale);
+      scale = newScale;
+      applyTransform();
+    }
+
+    // Tính tọa độ tĩnh của ô thành viên so với panContainer (không bị ảnh hưởng bởi zoom)
+    function getCardStaticOffset(card) {
+      let x = 0, y = 0;
+      let curr = card;
+      while (curr && curr !== container) {
+        x += curr.offsetLeft;
+        y += curr.offsetTop;
+        curr = curr.offsetParent;
+      }
+      return { x, y };
+    }
+
+    function resetToCenter() {
+      const isMobile = window.innerWidth < 768;
+      scale = isMobile ? 0.85 : 1.05;
+      const card1 = document.getElementById('card-1');
+      if (card1) {
+        const canRect = canvas.getBoundingClientRect();
+        const offset = getCardStaticOffset(card1);
+        pointX = (canRect.width / 2) - (offset.x + card1.offsetWidth / 2) * scale;
+        pointY = isMobile ? 45 : 65;
+      }
+      applyTransform();
+    }
+
+    /* ========================================================================= */
+    /* TÌM KIẾM HỖ TRỢ GÕ KHÔNG DẤU VÀ TRỎ CHUẨN XÁC ĐẾN THÀNH VIÊN TRÊN CÂY     */
+    /* ========================================================================= */
+    function removeVietnameseTones(str) {
+      if (!str) return '';
+      str = str.toLowerCase();
+      str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      str = str.replace(/[đĐ]/g, 'd');
+      return str;
+    }
+
     function performSearch() {
-      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const query = document.getElementById('searchInput').value.trim();
+      const queryClean = removeVietnameseTones(query);
       const genVal = document.getElementById('genFilter').value;
       const resContainer = document.getElementById('searchResults');
 
@@ -641,8 +929,10 @@
         return;
       }
 
-      const filtered = members.filter(m => {
-        const matchName = m.name.toLowerCase().includes(query) || (m.spouse && m.spouse.toLowerCase().includes(query));
+      const filtered = rawData.filter(m => {
+        const nameClean = removeVietnameseTones(m.name);
+        const spouseClean = removeVietnameseTones(m.spouse);
+        const matchName = nameClean.includes(queryClean) || spouseClean.includes(queryClean);
         const matchGen = genVal === "" || m.gen.toString() === genVal;
         return matchName && matchGen;
       });
@@ -653,72 +943,102 @@
         return;
       }
 
-      resContainer.innerHTML = filtered.map(m => `
+      resContainer.innerHTML = filtered.map(m => {
+        const sLabel = getSpouseLabel(m.name);
+        return `
         <div class="result-item" onclick="selectSearchResult(${m.id})">
           <div>
             <div class="r-name">${m.name}</div>
-            <div class="r-sub">${m.spouse !== "Chưa ghi nhận" ? 'Vợ/Chồng: ' + m.spouse : 'Số con: ' + m.childrenCount}</div>
+            <div class="r-sub">${m.spouse ? `${sLabel}:${m.spouse}` : `Số con: ${memberMap[m.id].children.length}`}</div>
           </div>
           <span class="r-gen">${romanGens[m.gen]}</span>
         </div>
-      `).join('');
+      `;}).join('');
       resContainer.style.display = 'block';
     }
 
-    // Khi bấm vào 1 người trong kết quả tìm kiếm
+    let isNavigatingToMember = false;
+
     function selectSearchResult(id) {
       document.getElementById('searchResults').style.display = 'none';
-      openDetailsById(id);
+      const inputEl = document.getElementById('searchInput');
+      inputEl.value = '';
+      inputEl.blur(); // Tắt bàn phím ảo ngay lập tức
 
-      // Nếu đang ở chế độ xem cây, tự cuộn tới thẻ đó và viền sáng
-      const card = document.getElementById('card-' + id);
-      if (card) {
-        // Gỡ highlight cũ
-        document.querySelectorAll('.member-card.highlight').forEach(el => el.classList.remove('highlight'));
-        card.classList.add('highlight');
-        setTimeout(() => {
-          card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-        }, 150);
-      }
+      isNavigatingToMember = true;
+      setTimeout(() => { isNavigatingToMember = false; }, 800);
+
+      selectMember(id);
     }
 
-    // Mở Popup chi tiết
-    function openDetailsById(id) {
-      const m = members.find(item => item.id === id);
+    // TRỎ ĐẾN Ô THÀNH VIÊN: GIỮ NGUYÊN MỨC ZOOM HIỆN TẠI (KHÔNG PHÓNG TO THÊM)
+    function selectMember(id, event) {
+      if (event) event.stopPropagation();
+
+      switchView('tree', true);
+
+      const m = memberMap[id];
       if (!m) return;
-      document.getElementById('modalName').innerText = m.name;
-      document.getElementById('modalGen').innerText = romanGens[m.gen];
-      document.getElementById('modalSpouse').innerText = m.spouse;
-      document.getElementById('modalChildren').innerText = m.childrenCount;
-      document.getElementById('modalChildrenList').innerText = m.childrenList;
-      document.getElementById('modalNote').innerText = m.note;
-      document.getElementById('infoModal').style.display = 'flex';
+
+      const card = document.getElementById('card-' + id);
+      if (!card) return;
+
+      // Đánh dấu nổi bật duy nhất người được chọn
+      document.querySelectorAll('.member-card.highlight').forEach(el => el.classList.remove('highlight'));
+      card.classList.add('highlight');
+
+      // GIỮ NGUYÊN MỨC ZOOM HIỆN TẠI: Không thay đổi giá trị scale
+      const offset = getCardStaticOffset(card);
+      const canRect = canvas.getBoundingClientRect();
+
+      // Căn chính diện người đó vào giữa màn hình theo mức zoom hiện có
+      pointX = (canRect.width / 2) - (offset.x + card.offsetWidth / 2) * scale;
+      pointY = (canRect.height / 2) - (offset.y + card.offsetHeight / 2) * scale;
+      applyTransform();
+
+      // Hiển thị thông tin chi tiết (Hiển thị chính xác Vợ: hoặc Chồng:)
+      const sLabel = getSpouseLabel(m.name);
+      document.getElementById('mName').innerText = m.name;
+      document.getElementById('mGen').innerText = romanGens[m.gen];
+      document.getElementById('mSpouseLabel').innerText = `${sLabel}:`;
+      document.getElementById('mSpouse').innerText = m.spouse || 'Chưa ghi nhận';
+      document.getElementById('mChildren').innerText = m.children.length > 0 ? `${m.children.length} người con` : 'Chưa ghi nhận con';
+      document.getElementById('mDeathAnniv').innerText = m.deathText || 'Chưa ghi nhận';
+      const cNames = m.children.map(c => c.name).join(', ');
+      document.getElementById('mChildrenList').innerText = cNames || 'Chưa có thông tin';
+      document.getElementById('mNote').innerText = `Thế hệ thứ ${m.gen} trong phả chi`;
+
+      setTimeout(() => {
+        document.getElementById('infoModal').style.display = 'flex';
+      }, 120);
     }
 
-    function closeModal() {
+    function closeInfoModal() {
       document.getElementById('infoModal').style.display = 'none';
     }
-    function closeDetails(e) {
-      if (e.target.id === 'infoModal') closeModal();
-    }
 
-    // Đóng danh sách tìm kiếm khi bấm ra ngoài
-    document.addEventListener('click', function(e) {
+    function openQrModal() { document.getElementById('qrModal').style.display = 'flex'; }
+    function closeQrModal() { document.getElementById('qrModal').style.display = 'none'; }
+
+    document.addEventListener('click', (e) => {
       if (!e.target.closest('.search-section')) {
         document.getElementById('searchResults').style.display = 'none';
       }
     });
 
-    // Tự động nhận diện thiết bị khi mở trang:
-    // Trên điện thoại (< 768px): Mặc định bật Chế độ Danh Sách để xem ngay không cần zoom.
-    // Trên máy tính (>= 768px): Mặc định mở Sơ Đồ Cây hoành tráng.
+    let lastWindowWidth = window.innerWidth;
+    window.addEventListener('resize', () => {
+      if (isNavigatingToMember) return;
+      if (Math.abs(window.innerWidth - lastWindowWidth) > 80) {
+        lastWindowWidth = window.innerWidth;
+        resetToCenter();
+      }
+    });
+
     window.addEventListener('DOMContentLoaded', () => {
       renderListMode();
-      if (window.innerWidth < 768) {
-        switchView('list');
-      } else {
-        switchView('tree');
-      }
+      updateLunarAndAnniversary();
+      switchView('tree');
     });
   </script>
 </body>
