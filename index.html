@@ -12,7 +12,7 @@
       --bg: #f5f4ef;
       --card-bg: #ffffff;
       --text: #2d3748;
-      --line: #8b1c1c; /* ĐƯỜNG NỐI CÂY MÀU ĐỎ TRÙNG MÀU Ô */
+      --line: #8b1c1c;
       --highlight: #fff3cd;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -287,7 +287,7 @@
     <div class="header-main">
       <div class="header-title">
         <h1>ĐỒ PHẢ CHI PHẠM VĂN</h1>
-        <p>Tiền Phong Thượng Thôn (186 thành viên qua 7 đời)</p>
+        <p id="subTitleCount">Tiền Phong Thượng Thôn (193 thành viên qua 7 đời)</p>
       </div>
 
       <!-- NÚT MÃ QR GÓC PHẢI -->
@@ -361,9 +361,10 @@
       <button class="modal-close" onclick="closeInfoModal()">&times;</button>
       <div class="modal-title" id="mName">Họ và tên</div>
       <div class="modal-row"><span class="modal-label">Thế hệ / Đời:</span> <span id="mGen" style="font-weight:bold; color:var(--primary);"></span></div>
-      <div class="modal-row"><span class="modal-label" id="mSpouseLabel">Vợ/Chồng:</span> <span id="mSpouse"></span></div>
+      <div class="modal-row" id="mSpouseRow"><span class="modal-label" id="mSpouseLabel">Vợ/Chồng:</span> <span id="mSpouse"></span></div>
+      <div class="modal-row" id="mBirthRow"><span class="modal-label">Năm sinh:</span> <span id="mBirthYear"></span></div>
       <div class="modal-row"><span class="modal-label">Số con cái:</span> <span id="mChildren"></span></div>
-      <div class="modal-row"><span class="modal-label">Ngày giỗ ÂL:</span> <span id="mDeathAnniv"></span></div>
+      <div class="modal-row"><span class="modal-label">Sinh thành:</span> <span id="mParents" style="font-weight:600; color:#2d3748;"></span></div>
       <div class="modal-row"><span class="modal-label">Danh sách con:</span> <span id="mChildrenList"></span></div>
       <div class="modal-row"><span class="modal-label">Ghi chú:</span> <span id="mNote" style="color:#666;"></span></div>
     </div>
@@ -382,202 +383,210 @@
   <script>
     const romanGens = ["", "Đời thứ I", "Đời thứ II", "Đời thứ III", "Đời thứ IV", "Đời thứ V", "Đời thứ VI", "Đời thứ VII"];
 
-    // HÀM XÁC ĐỊNH CHỮ "VỢ" HOẶC "CHỒNG" CHUẨN XÁC THEO GIỚI TÍNH
     function getSpouseLabel(name) {
       const n = (name || '').toUpperCase();
       if (n.includes('THỊ') || n.includes('BÀ ')) return 'Chồng';
       return 'Vợ';
     }
 
-    // 186 THÀNH VIÊN ĐẦY ĐỦ TRÍCH XUẤT TỪ FILE EXCEL
+    // 193 THÀNH VIÊN ĐẦY ĐỦ VÀ CHUẨN XÁC THEO SƠ ĐỒ EXCEL
     const rawData = [
-      {"id": 1, "name": "CỤ TIẾU", "gen": 1, "spouse": "VŨ THỊ HÀNG", "parentId": null, "deathDay": 15, "deathMonth": 1, "deathText": "Rằm tháng Giêng (15 tháng Giêng Âm lịch)"},
-      {"id": 2, "name": "PHẠM HÚY TÁM", "gen": 2, "spouse": "", "parentId": 1, "deathDay": 10, "deathMonth": 3, "deathText": "10 tháng 3 Âm lịch"},
-      {"id": 3, "name": "PHẠM HÚY BÉ", "gen": 2, "spouse": "", "parentId": 1},
-      {"id": 4, "name": "PHẠM VĂN TẮC", "gen": 2, "spouse": "LÊ THỊ LIÊN", "parentId": 1, "deathDay": 22, "deathMonth": 6, "deathText": "22 tháng 6 Âm lịch"},
-      {"id": 5, "name": "PHẠM HÚY ÚT", "gen": 2, "spouse": "", "parentId": 1},
-      {"id": 6, "name": "PHẠM HÚY NGÂN", "gen": 2, "spouse": "", "parentId": 1, "deathDay": 18, "deathMonth": 4, "deathText": "18 tháng 4 Âm lịch"},
-      {"id": 7, "name": "PHẠM HÚY NHỠ", "gen": 2, "spouse": "", "parentId": 1},
-      {"id": 8, "name": "PHẠM VĂN TỐC", "gen": 2, "spouse": "TRẦN THỊ KHÁI, NGUYỄN THỊ NHỊ, LÊ THỊ TAM", "parentId": 1, "deathDay": 5, "deathMonth": 9, "deathText": "05 tháng 9 Âm lịch"},
-      {"id": 9, "name": "PHẠM HÚY PIU", "gen": 2, "spouse": "", "parentId": 1},
-      {"id": 10, "name": "PHẠM HÚY TIẾU", "gen": 2, "spouse": "", "parentId": 1},
-      {"id": 11, "name": "PHẠM HÚY RỘNG", "gen": 3, "spouse": "", "parentId": 4, "deathDay": 12, "deathMonth": 10, "deathText": "12 tháng 10 Âm lịch"},
-      {"id": 12, "name": "PHẠM VĂN TẶNG", "gen": 3, "spouse": "TRỊNH THỊ THẮM, CAO THỊ THÔNG", "parentId": 4, "deathDay": 2, "deathMonth": 11, "deathText": "02 tháng 11 Âm lịch"},
-      {"id": 13, "name": "PHẠM THỊ ÊM", "gen": 3, "spouse": "", "parentId": 4},
-      {"id": 14, "name": "PHẠM HÚY ÁI", "gen": 3, "spouse": "", "parentId": 4},
-      {"id": 15, "name": "PHẠM HÚY HỘT", "gen": 3, "spouse": "", "parentId": 4},
-      {"id": 16, "name": "PHẠM HÚY TRÒN", "gen": 3, "spouse": "", "parentId": 4},
-      {"id": 17, "name": "PHẠM THỊ KHÁNG", "gen": 3, "spouse": "PHẠM VĂN NHUẬN", "parentId": 8},
-      {"id": 18, "name": "PHẠM VĂN THÚC", "gen": 3, "spouse": "PHẠM THỊ NỞ", "parentId": 8},
-      {"id": 19, "name": "PHẠM VĂN TIÊU", "gen": 3, "spouse": "HOÀNG THỊ XỚN", "parentId": 8},
-      {"id": 20, "name": "PHẠM VĂN TỨ", "gen": 4, "spouse": "PHẠM THỊ MÙI, MAI THỊ CẬY", "parentId": 12, "deathDay": 14, "deathMonth": 7, "deathText": "14 tháng 7 Âm lịch"},
-      {"id": 21, "name": "PHẠM VĂN RU", "gen": 4, "spouse": "LÊ THỊ HOA, NGUYỄN THỊ CHẮT", "parentId": 12},
-      {"id": 22, "name": "PHẠM HÚY RUY", "gen": 4, "spouse": "", "parentId": 12},
-      {"id": 23, "name": "PHẠM THỊ PHƯƠNG", "gen": 4, "spouse": "", "parentId": 12},
-      {"id": 24, "name": "PHẠM VĂN VŨ", "gen": 4, "spouse": "HOÀNG THỊ HÀ TÂM", "parentId": 12},
-      {"id": 25, "name": "PHẠM THỊ", "gen": 4, "spouse": "", "parentId": 12},
-      {"id": 26, "name": "PHẠM VĂN BÁU", "gen": 4, "spouse": "TRẦN THỊ TỐT", "parentId": 12},
-      {"id": 27, "name": "PHẠM HÚY NGẮN", "gen": 4, "spouse": "", "parentId": 12},
-      {"id": 28, "name": "PHẠM HÚY SÒI", "gen": 4, "spouse": "", "parentId": 12},
-      {"id": 29, "name": "PHẠM HÚY QUÝ", "gen": 4, "spouse": "", "parentId": 12},
-      {"id": 30, "name": "ÔNG SÁCH", "gen": 4, "spouse": "NGUYỄN THỊ NGHẢI", "parentId": 18},
-      {"id": 31, "name": "PHẠM HÚY THÍN", "gen": 4, "spouse": "", "parentId": 18},
-      {"id": 32, "name": "BÀ LÂM", "gen": 4, "spouse": "", "parentId": 18},
-      {"id": 33, "name": "BÀ CHU", "gen": 4, "spouse": "", "parentId": 18},
-      {"id": 34, "name": "ÔNG Y", "gen": 4, "spouse": "", "parentId": 18},
-      {"id": 35, "name": "ÔNG Ý", "gen": 4, "spouse": "NGUYỄN THỊ ĐÀO", "parentId": 18},
-      {"id": 36, "name": "BÀ HOA", "gen": 4, "spouse": "", "parentId": 18},
-      {"id": 37, "name": "BÀ HỒNG", "gen": 4, "spouse": "", "parentId": 18},
-      {"id": 38, "name": "BÀ SỢI", "gen": 4, "spouse": "", "parentId": 18},
-      {"id": 39, "name": "ÔNG TUYỂN", "gen": 4, "spouse": "", "parentId": 18},
-      {"id": 40, "name": "PHẠM HÚY TỐN", "gen": 4, "spouse": "", "parentId": 19},
-      {"id": 41, "name": "BÀ TƠ", "gen": 4, "spouse": "", "parentId": 19},
-      {"id": 42, "name": "BÀ LÀ", "gen": 4, "spouse": "", "parentId": 19},
-      {"id": 43, "name": "BÀ LƯỢT", "gen": 4, "spouse": "", "parentId": 19},
-      {"id": 44, "name": "ÔNG PHÙNG", "gen": 4, "spouse": "", "parentId": 19},
-      {"id": 45, "name": "ÔNG CHU", "gen": 4, "spouse": "", "parentId": 19},
-      {"id": 46, "name": "ÔNG TIẾN", "gen": 4, "spouse": "", "parentId": 19},
-      {"id": 47, "name": "BÀ THE", "gen": 4, "spouse": "", "parentId": 19},
-      {"id": 48, "name": "PHẠM VĂN HIỀN", "gen": 5, "spouse": "", "parentId": 20},
-      {"id": 49, "name": "PHẠM VĂN HIỂN", "gen": 5, "spouse": "", "parentId": 20},
-      {"id": 50, "name": "PHẠM THỊ HÒA", "gen": 5, "spouse": "", "parentId": 20},
-      {"id": 51, "name": "PHẠM THỊ HỢP", "gen": 5, "spouse": "", "parentId": 20},
-      {"id": 52, "name": "PHẠM HÚY CHẮT", "gen": 5, "spouse": "", "parentId": 20},
-      {"id": 53, "name": "PHẠM THỊ THANH", "gen": 5, "spouse": "", "parentId": 21},
-      {"id": 54, "name": "PHẠM THỊ CẬY", "gen": 5, "spouse": "", "parentId": 21},
-      {"id": 55, "name": "PHẠM THỊ XUYẾN", "gen": 5, "spouse": "", "parentId": 21},
-      {"id": 56, "name": "PHẠM VĂN DOANH", "gen": 5, "spouse": "BÀ THANH", "parentId": 21},
-      {"id": 57, "name": "PHẠM VĂN RUỆ", "gen": 5, "spouse": "", "parentId": 21},
-      {"id": 58, "name": "PHẠM VĂN ĐỆ", "gen": 5, "spouse": "", "parentId": 21},
-      {"id": 59, "name": "PHẠM VĂN HƯNG", "gen": 5, "spouse": "", "parentId": 21},
-      {"id": 60, "name": "PHẠM THỊ HƯỜNG", "gen": 5, "spouse": "", "parentId": 24},
-      {"id": 61, "name": "PHẠM THỊ HÀ", "gen": 5, "spouse": "", "parentId": 24},
-      {"id": 62, "name": "PHẠM VĂN HÙNG", "gen": 5, "spouse": "", "parentId": 24},
-      {"id": 63, "name": "PHẠM THỊ ANH", "gen": 5, "spouse": "", "parentId": 24},
-      {"id": 64, "name": "PHẠM VĂN CƯỜNG", "gen": 5, "spouse": "", "parentId": 24},
-      {"id": 65, "name": "PHẠM VĂN LÂM", "gen": 5, "spouse": "", "parentId": 26},
-      {"id": 66, "name": "PHẠM THỊ LIỄU", "gen": 5, "spouse": "", "parentId": 26},
-      {"id": 67, "name": "PHẠM THỊ ĐÔNG", "gen": 5, "spouse": "", "parentId": 26},
-      {"id": 68, "name": "PHẠM THỊ NHÀNG", "gen": 5, "spouse": "", "parentId": 26},
-      {"id": 69, "name": "PHẠM VĂN TRƯỜNG", "gen": 5, "spouse": "", "parentId": 26},
-      {"id": 70, "name": "PHẠM THỊ ĐÀO", "gen": 5, "spouse": "", "parentId": 26},
-      {"id": 71, "name": "PHẠM VĂN TOÀN", "gen": 5, "spouse": "", "parentId": 26},
-      {"id": 72, "name": "PHẠM VĂN HUẤN", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 73, "name": "PHẠM THỊ THOA", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 74, "name": "PHẠM THỊ THÊU", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 75, "name": "PHẠM VĂN BÚT", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 76, "name": "PHẠM THỊ GẤM", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 77, "name": "PHẠM THỊ THỦY", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 78, "name": "PHẠM VĂN NGHIÊM", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 79, "name": "PHẠM THỊ THU", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 80, "name": "PHẠM THỊ ĐÔNG", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 81, "name": "PHẠM VĂN NGHI", "gen": 5, "spouse": "", "parentId": 30},
-      {"id": 82, "name": "PHẠM VĂN ĐÌNH", "gen": 5, "spouse": "", "parentId": 34},
-      {"id": 83, "name": "PHẠM VĂN QUỲNH", "gen": 5, "spouse": "", "parentId": 34},
-      {"id": 84, "name": "PHẠM THỊ LIN", "gen": 5, "spouse": "", "parentId": 34},
-      {"id": 85, "name": "PHẠM THỊ LEN", "gen": 5, "spouse": "", "parentId": 34},
-      {"id": 86, "name": "PHẠM THỊ LOAN", "gen": 5, "spouse": "", "parentId": 34},
-      {"id": 87, "name": "PHẠM THỊ LIỄU", "gen": 5, "spouse": "", "parentId": 34},
-      {"id": 88, "name": "PHẠM THỊ LUYẾN", "gen": 5, "spouse": "", "parentId": 34},
-      {"id": 89, "name": "PHẠM THỊ LỊU", "gen": 5, "spouse": "", "parentId": 34},
-      {"id": 90, "name": "PHẠM THỊ PHẤN", "gen": 5, "spouse": "", "parentId": 34},
-      {"id": 91, "name": "PHẠM VĂN ĐỊNH", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 92, "name": "PHẠM VĂN TRÌNH", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 93, "name": "PHẠM THỊ LUYẾN", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 94, "name": "PHẠM THỊ THANH", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 95, "name": "PHẠM VĂN NHÂN", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 96, "name": "PHẠM THỊ KHUYÊN", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 97, "name": "PHẠM THỊ NHẪN", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 98, "name": "PHẠM VĂN KHƯƠNG", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 99, "name": "PHẠM THỊ MẾN", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 100, "name": "PHẠM VĂN SÁNG", "gen": 5, "spouse": "", "parentId": 35},
-      {"id": 101, "name": "PHẠM THỊ RỊU", "gen": 5, "spouse": "", "parentId": 39},
-      {"id": 102, "name": "PHẠM THỊ RÁY", "gen": 5, "spouse": "", "parentId": 39},
-      {"id": 103, "name": "PHẠM THỊ TUYẾT", "gen": 5, "spouse": "", "parentId": 39},
-      {"id": 104, "name": "PHẠM THỊ RƯƠNG", "gen": 5, "spouse": "", "parentId": 39},
-      {"id": 105, "name": "PHẠM THỊ RINH", "gen": 5, "spouse": "", "parentId": 39},
-      {"id": 106, "name": "PHẠM VĂN ĐỒNG", "gen": 5, "spouse": "", "parentId": 39},
-      {"id": 107, "name": "PHẠM THỊ TRINH", "gen": 5, "spouse": "", "parentId": 39},
-      {"id": 108, "name": "PHẠM VĂN HÀN", "gen": 5, "spouse": "", "parentId": 39},
-      {"id": 109, "name": "PHẠM VĂN LUẬN", "gen": 5, "spouse": "", "parentId": 44},
-      {"id": 110, "name": "PHẠM THỊ PHƯỢNG", "gen": 5, "spouse": "", "parentId": 44},
-      {"id": 111, "name": "PHẠM THỊ NGÂN", "gen": 5, "spouse": "", "parentId": 44},
-      {"id": 112, "name": "PHẠM THỊ THUẬN", "gen": 5, "spouse": "", "parentId": 44},
-      {"id": 113, "name": "PHẠM THỊ THẢO", "gen": 5, "spouse": "", "parentId": 44},
-      {"id": 114, "name": "PHẠM VĂN HIỆP", "gen": 5, "spouse": "", "parentId": 45},
-      {"id": 115, "name": "PHẠM VĂN HIẾU", "gen": 5, "spouse": "", "parentId": 45},
-      {"id": 116, "name": "PHẠM VĂN HẬU", "gen": 5, "spouse": "", "parentId": 45},
-      {"id": 117, "name": "PHẠM THỊ THU", "gen": 5, "spouse": "", "parentId": 45},
-      {"id": 118, "name": "PHẠM VĂN CÔNG", "gen": 5, "spouse": "", "parentId": 46},
-      {"id": 119, "name": "PHẠM VĂN ĐÍNH", "gen": 5, "spouse": "", "parentId": 46},
-      {"id": 120, "name": "PHẠM VĂN HƯỚNG", "gen": 5, "spouse": "", "parentId": 46},
-      {"id": 121, "name": "PHẠM THỊ NHÀI", "gen": 5, "spouse": "", "parentId": 46},
-      {"id": 122, "name": "PHẠM THỊ NHUNG", "gen": 5, "spouse": "", "parentId": 46},
-      {"id": 123, "name": "PHẠM VĂN DŨNG (1969)", "gen": 6, "spouse": "HOÀNG THỊ HẢO (1973)", "parentId": 48},
-      {"id": 124, "name": "PHẠM VĂN DƯƠNG", "gen": 6, "spouse": "NGUYỄN THỊ OANH", "parentId": 48},
-      {"id": 125, "name": "PHẠM VĂN ĐĂNG", "gen": 6, "spouse": "NGUYỄN THỊ HOA", "parentId": 48},
-      {"id": 126, "name": "PHẠM VĂN RƯ", "gen": 6, "spouse": "DUYÊN", "parentId": 56},
-      {"id": 127, "name": "PHẠM VĂN RẬT", "gen": 6, "spouse": "", "parentId": 56},
-      {"id": 128, "name": "PHẠM VĂN SƠN (1990)", "gen": 6, "spouse": "HƯƠNG (1988)", "parentId": 58},
-      {"id": 129, "name": "PHẠM TRỌNG HIỆP", "gen": 6, "spouse": "", "parentId": 58},
-      {"id": 130, "name": "PHẠM THỊ KHUY", "gen": 6, "spouse": "", "parentId": 59},
-      {"id": 131, "name": "PHẠM VĂN HÀ", "gen": 6, "spouse": "", "parentId": 59},
-      {"id": 132, "name": "PHẠM VĂN HUYẾN", "gen": 6, "spouse": "", "parentId": 59},
-      {"id": 133, "name": "PHẠM NGỌC THAO (1993)", "gen": 6, "spouse": "", "parentId": 65},
-      {"id": 134, "name": "PHẠM NGỌC THỂ (1995)", "gen": 6, "spouse": "", "parentId": 65},
-      {"id": 135, "name": "PHẠM THỊ LINH", "gen": 6, "spouse": "", "parentId": 71},
-      {"id": 136, "name": "PHẠM VĂN PHI", "gen": 6, "spouse": "", "parentId": 71},
-      {"id": 137, "name": "PHẠM VĂN VĂN", "gen": 6, "spouse": "", "parentId": 75},
-      {"id": 138, "name": "PHẠM THỊ HƯỜNG", "gen": 6, "spouse": "", "parentId": 75},
-      {"id": 139, "name": "PHẠM VĂN TÍNH", "gen": 6, "spouse": "", "parentId": 75},
-      {"id": 140, "name": "PHẠM VĂN TOÁN", "gen": 6, "spouse": "", "parentId": 75},
-      {"id": 141, "name": "PHẠM THỊ LEN", "gen": 6, "spouse": "", "parentId": 78},
-      {"id": 142, "name": "PHẠM VĂN LIỆU", "gen": 6, "spouse": "", "parentId": 78},
-      {"id": 143, "name": "PHẠM VĂN SƠN", "gen": 6, "spouse": "", "parentId": 82},
-      {"id": 144, "name": "PHẠM THỊ", "gen": 6, "spouse": "", "parentId": 82},
-      {"id": 145, "name": "PHẠM VĂN SĨ", "gen": 6, "spouse": "", "parentId": 83},
-      {"id": 146, "name": "PHẠM THỊ LUYỆN", "gen": 6, "spouse": "", "parentId": 84},
-      {"id": 147, "name": "PHẠM THỊ KHÁNH", "gen": 6, "spouse": "", "parentId": 84},
-      {"id": 148, "name": "PHẠM THỊ HƯNG", "gen": 6, "spouse": "", "parentId": 84},
-      {"id": 149, "name": "PHẠM VĂN VI", "gen": 6, "spouse": "", "parentId": 91},
-      {"id": 150, "name": "PHẠM VĂN KẾT", "gen": 6, "spouse": "", "parentId": 91},
-      {"id": 151, "name": "PHẠM THỊ NHI", "gen": 6, "spouse": "", "parentId": 92},
-      {"id": 152, "name": "PHẠM VĂN CỦA", "gen": 6, "spouse": "", "parentId": 92},
-      {"id": 153, "name": "PHẠM VĂN PHƯƠNG", "gen": 6, "spouse": "", "parentId": 95},
-      {"id": 154, "name": "PHẠM THỊ THẢO", "gen": 6, "spouse": "", "parentId": 95},
-      {"id": 155, "name": "PHẠM THỊ DƯƠNG", "gen": 6, "spouse": "", "parentId": 95},
-      {"id": 156, "name": "PHẠM VĂN BẢO", "gen": 6, "spouse": "", "parentId": 100},
-      {"id": 157, "name": "PHẠM THỊ DIỄM", "gen": 6, "spouse": "", "parentId": 100},
-      {"id": 158, "name": "PHẠM VĂN ĐẠT", "gen": 6, "spouse": "", "parentId": 106},
-      {"id": 159, "name": "PHẠM MINH THƯ", "gen": 6, "spouse": "", "parentId": 106},
-      {"id": 160, "name": "PHẠM ANH THƯ", "gen": 6, "spouse": "", "parentId": 106},
-      {"id": 161, "name": "PHẠM VĂN ANH", "gen": 6, "spouse": "", "parentId": 108},
-      {"id": 162, "name": "PHẠM VĂN KIÊN", "gen": 6, "spouse": "", "parentId": 108},
-      {"id": 163, "name": "PHẠM VĂN ANH", "gen": 6, "spouse": "", "parentId": 109},
-      {"id": 164, "name": "PHẠM THỊ LINH", "gen": 6, "spouse": "", "parentId": 109},
-      {"id": 165, "name": "PHẠM THỊ CHI", "gen": 6, "spouse": "", "parentId": 109},
-      {"id": 166, "name": "PHẠM VĂN PHÚ", "gen": 6, "spouse": "", "parentId": 114},
-      {"id": 167, "name": "PHẠM THỊ TOAN", "gen": 6, "spouse": "", "parentId": 114},
-      {"id": 168, "name": "PHẠM THỊ NGỌC", "gen": 6, "spouse": "", "parentId": 115},
-      {"id": 169, "name": "PHẠM THỊ ANH", "gen": 6, "spouse": "", "parentId": 115},
-      {"id": 170, "name": "PHẠM VĂN QUÂN", "gen": 6, "spouse": "", "parentId": 116},
-      {"id": 171, "name": "PHẠM VĂN ĐẠT", "gen": 6, "spouse": "", "parentId": 116},
-      {"id": 172, "name": "PHẠM VĂN HOÀNG", "gen": 6, "spouse": "", "parentId": 118},
-      {"id": 173, "name": "PHẠM VĂN PHONG", "gen": 6, "spouse": "", "parentId": 118},
-      {"id": 174, "name": "PHẠM VĂN VINH", "gen": 6, "spouse": "", "parentId": 119},
-      {"id": 175, "name": "PHẠM THỊ HUẾ (1992)", "gen": 7, "spouse": "NGUYỄN ĐỨC HẢI (1986)", "parentId": 123},
-      {"id": 176, "name": "PHẠM THỊ QUẾ (1994)", "gen": 7, "spouse": "TRẦN VĂN TẤN (1990)", "parentId": 123},
-      {"id": 177, "name": "PHẠM ĐÌNH THIÊM (1999)", "gen": 7, "spouse": "", "parentId": 123},
-      {"id": 178, "name": "PHẠM THỊ ÁNH (1998)", "gen": 7, "spouse": "CAO QUANG HƯỚNG (1993)", "parentId": 124},
-      {"id": 179, "name": "PHẠM ĐÌNH TUYÊN (2004)", "gen": 7, "spouse": "", "parentId": 124},
-      {"id": 180, "name": "PHẠM VĂN DANH (2004)", "gen": 7, "spouse": "", "parentId": 125},
-      {"id": 181, "name": "PHẠM LINH ĐAN (2011)", "gen": 7, "spouse": "", "parentId": 125},
-      {"id": 182, "name": "PHẠM VĂN HUY", "gen": 7, "spouse": "", "parentId": 126},
-      {"id": 183, "name": "PHẠM VĂN NAM", "gen": 7, "spouse": "", "parentId": 126},
-      {"id": 184, "name": "PHẠM THỊ CHÂU", "gen": 7, "spouse": "", "parentId": 126},
-      {"id": 185, "name": "PHẠM THỊ TRÂM", "gen": 7, "spouse": "", "parentId": 129},
-      {"id": 186, "name": "PHẠM THỊ VY", "gen": 7, "spouse": "", "parentId": 129}
+      {"id": 1, "name": "CỤ TIẾU", "gen": 1, "spouse": "VŨ THỊ HÀNG", "parentId": null, "birthYear": "", "deathDay": 15, "deathMonth": 1, "deathText": "Rằm tháng Giêng (15 tháng Giêng Âm lịch)"},
+      {"id": 2, "name": "PHẠM HÚY TÁM", "gen": 2, "spouse": "", "parentId": 1, "birthYear": "", "deathDay": 10, "deathMonth": 3, "deathText": "10 tháng 3 Âm lịch"},
+      {"id": 3, "name": "PHẠM HÚY BÉ", "gen": 2, "spouse": "", "parentId": 1, "birthYear": ""},
+      {"id": 4, "name": "PHẠM VĂN TẮC", "gen": 2, "spouse": "LÊ THỊ LIÊN", "parentId": 1, "birthYear": "", "deathDay": 22, "deathMonth": 6, "deathText": "22 tháng 6 Âm lịch"},
+      {"id": 5, "name": "PHẠM HÚY ÚT", "gen": 2, "spouse": "", "parentId": 1, "birthYear": ""},
+      {"id": 6, "name": "PHẠM HÚY NGÂN", "gen": 2, "spouse": "", "parentId": 1, "birthYear": "", "deathDay": 18, "deathMonth": 4, "deathText": "18 tháng 4 Âm lịch"},
+      {"id": 7, "name": "PHẠM HÚY NHỠ", "gen": 2, "spouse": "", "parentId": 1, "birthYear": ""},
+      {"id": 8, "name": "PHẠM VĂN TỐC", "gen": 2, "spouse": "TRẦN THỊ KHÁI, NGUYỄN THỊ NHỊ, LÊ THỊ TAM", "parentId": 1, "birthYear": "", "deathDay": 5, "deathMonth": 9, "deathText": "05 tháng 9 Âm lịch"},
+      {"id": 9, "name": "PHẠM HÚY PIU", "gen": 2, "spouse": "", "parentId": 1, "birthYear": ""},
+      {"id": 10, "name": "PHẠM HÚY TIẾU", "gen": 2, "spouse": "", "parentId": 1, "birthYear": ""},
+      {"id": 11, "name": "PHẠM HÚY RỘNG", "gen": 3, "spouse": "", "parentId": 4, "birthYear": "", "deathDay": 12, "deathMonth": 10, "deathText": "12 tháng 10 Âm lịch"},
+      {"id": 12, "name": "PHẠM VĂN TẶNG", "gen": 3, "spouse": "TRỊNH THỊ THẮM, CAO THỊ THÔNG", "parentId": 4, "birthYear": "", "deathDay": 2, "deathMonth": 11, "deathText": "02 tháng 11 Âm lịch"},
+      {"id": 13, "name": "PHẠM THỊ ÊM", "gen": 3, "spouse": "", "parentId": 4, "birthYear": ""},
+      {"id": 14, "name": "PHẠM HÚY ÁI", "gen": 3, "spouse": "", "parentId": 4, "birthYear": ""},
+      {"id": 15, "name": "PHẠM HÚY HỘT", "gen": 3, "spouse": "", "parentId": 4, "birthYear": ""},
+      {"id": 16, "name": "PHẠM HÚY TRÒN", "gen": 3, "spouse": "", "parentId": 4, "birthYear": ""},
+      {"id": 17, "name": "PHẠM THỊ KHÁNG", "gen": 3, "spouse": "PHẠM VĂN NHUẬN", "parentId": 8, "birthYear": ""},
+      {"id": 18, "name": "PHẠM VĂN THÚC", "gen": 3, "spouse": "PHẠM THỊ NỞ", "parentId": 8, "birthYear": ""},
+      {"id": 19, "name": "PHẠM VĂN TIÊU", "gen": 3, "spouse": "HOÀNG THỊ XỚN", "parentId": 8, "birthYear": ""},
+      {"id": 20, "name": "PHẠM VĂN TỨ", "gen": 4, "spouse": "PHẠM THỊ MÙI, MAI THỊ CẬY", "parentId": 12, "birthYear": "", "deathDay": 14, "deathMonth": 7, "deathText": "14 tháng 7 Âm lịch"},
+      {"id": 21, "name": "PHẠM VĂN RU", "gen": 4, "spouse": "LÊ THỊ HOA, NGUYỄN THỊ CHẮT", "parentId": 12, "birthYear": ""},
+      {"id": 22, "name": "PHẠM HÚY RUY", "gen": 4, "spouse": "", "parentId": 12, "birthYear": ""},
+      {"id": 23, "name": "PHẠM THỊ PHƯƠNG", "gen": 4, "spouse": "", "parentId": 12, "birthYear": ""},
+      {"id": 24, "name": "PHẠM VĂN VŨ", "gen": 4, "spouse": "HOÀNG THỊ HÀ TÂM", "parentId": 12, "birthYear": ""},
+      {"id": 25, "name": "PHẠM THỊ", "gen": 4, "spouse": "", "parentId": 12, "birthYear": ""},
+      {"id": 26, "name": "PHẠM VĂN BÁU", "gen": 4, "spouse": "TRẦN THỊ TỐT", "parentId": 12, "birthYear": ""},
+      {"id": 27, "name": "PHẠM HÚY NGẮN", "gen": 4, "spouse": "", "parentId": 12, "birthYear": ""},
+      {"id": 28, "name": "PHẠM HÚY SÒI", "gen": 4, "spouse": "", "parentId": 12, "birthYear": ""},
+      {"id": 29, "name": "PHẠM HÚY QUÝ", "gen": 4, "spouse": "", "parentId": 12, "birthYear": ""},
+      {"id": 30, "name": "ÔNG SÁCH", "gen": 4, "spouse": "NGUYỄN THỊ NGHẢI", "parentId": 18, "birthYear": ""},
+      {"id": 31, "name": "PHẠM HÚY THÍN", "gen": 4, "spouse": "", "parentId": 18, "birthYear": ""},
+      {"id": 32, "name": "BÀ LÂM", "gen": 4, "spouse": "", "parentId": 18, "birthYear": ""},
+      {"id": 33, "name": "BÀ CHU", "gen": 4, "spouse": "", "parentId": 18, "birthYear": ""},
+      {"id": 34, "name": "ÔNG Y", "gen": 4, "spouse": "", "parentId": 18, "birthYear": ""},
+      {"id": 35, "name": "ÔNG Ý", "gen": 4, "spouse": "NGUYỄN THỊ ĐÀO", "parentId": 18, "birthYear": ""},
+      {"id": 36, "name": "BÀ HOA", "gen": 4, "spouse": "", "parentId": 18, "birthYear": ""},
+      {"id": 37, "name": "BÀ HỒNG", "gen": 4, "spouse": "", "parentId": 18, "birthYear": ""},
+      {"id": 38, "name": "BÀ SỢI", "gen": 4, "spouse": "", "parentId": 18, "birthYear": ""},
+      {"id": 39, "name": "ÔNG TUYỂN", "gen": 4, "spouse": "", "parentId": 18, "birthYear": ""},
+      {"id": 40, "name": "PHẠM HÚY TỐN", "gen": 4, "spouse": "", "parentId": 19, "birthYear": ""},
+      {"id": 41, "name": "BÀ TƠ", "gen": 4, "spouse": "", "parentId": 19, "birthYear": ""},
+      {"id": 42, "name": "BÀ LÀ", "gen": 4, "spouse": "", "parentId": 19, "birthYear": ""},
+      {"id": 43, "name": "BÀ LƯỢT", "gen": 4, "spouse": "", "parentId": 19, "birthYear": ""},
+      {"id": 44, "name": "ÔNG PHÙNG", "gen": 4, "spouse": "Hoàng Thị Tâm", "parentId": 19, "birthYear": ""},
+      {"id": 45, "name": "ÔNG CHU", "gen": 4, "spouse": "Cao Thị Thơm", "parentId": 19, "birthYear": ""},
+      {"id": 46, "name": "ÔNG TIẾN", "gen": 4, "spouse": "Nguyễn Thị Liên", "parentId": 19, "birthYear": ""},
+      {"id": 47, "name": "BÀ THE", "gen": 4, "spouse": "", "parentId": 19, "birthYear": ""},
+      {"id": 48, "name": "PHẠM VĂN HIỀN", "gen": 5, "spouse": "", "parentId": 20, "birthYear": ""},
+      {"id": 49, "name": "PHẠM VĂN HIỂN", "gen": 5, "spouse": "", "parentId": 20, "birthYear": ""},
+      {"id": 50, "name": "PHẠM THỊ HÒA", "gen": 5, "spouse": "", "parentId": 20, "birthYear": ""},
+      {"id": 51, "name": "PHẠM THỊ HỢP", "gen": 5, "spouse": "", "parentId": 20, "birthYear": ""},
+      {"id": 52, "name": "PHẠM HÚY CHẮT", "gen": 5, "spouse": "", "parentId": 20, "birthYear": ""},
+      {"id": 53, "name": "PHẠM THỊ THANH", "gen": 5, "spouse": "", "parentId": 21, "birthYear": ""},
+      {"id": 54, "name": "PHẠM THỊ CẬY", "gen": 5, "spouse": "", "parentId": 21, "birthYear": ""},
+      {"id": 55, "name": "PHẠM THỊ XUYẾN", "gen": 5, "spouse": "", "parentId": 21, "birthYear": ""},
+      {"id": 56, "name": "PHẠM VĂN DOANH", "gen": 5, "spouse": "BÀ THANH", "parentId": 21, "birthYear": ""},
+      {"id": 57, "name": "PHẠM VĂN RUỆ", "gen": 5, "spouse": "", "parentId": 21, "birthYear": ""},
+      {"id": 58, "name": "PHẠM VĂN ĐỆ", "gen": 5, "spouse": "BÀ CHIẾN", "parentId": 21, "birthYear": ""},
+      {"id": 59, "name": "PHẠM VĂN HƯNG", "gen": 5, "spouse": "BÀ SEN", "parentId": 21, "birthYear": ""},
+      {"id": 60, "name": "PHẠM THỊ HƯỜNG", "gen": 5, "spouse": "", "parentId": 24, "birthYear": ""},
+      {"id": 61, "name": "PHẠM THỊ HÀ", "gen": 5, "spouse": "", "parentId": 24, "birthYear": ""},
+      {"id": 62, "name": "PHẠM VĂN HÙNG", "gen": 5, "spouse": "", "parentId": 24, "birthYear": ""},
+      {"id": 63, "name": "PHẠM THỊ ANH", "gen": 5, "spouse": "", "parentId": 24, "birthYear": ""},
+      {"id": 64, "name": "PHẠM VĂN CƯỜNG", "gen": 5, "spouse": "", "parentId": 24, "birthYear": ""},
+      {"id": 65, "name": "PHẠM VĂN LÂM", "gen": 5, "spouse": "", "parentId": 26, "birthYear": ""},
+      {"id": 66, "name": "PHẠM THỊ LIỄU", "gen": 5, "spouse": "", "parentId": 26, "birthYear": ""},
+      {"id": 67, "name": "PHẠM THỊ ĐÔNG", "gen": 5, "spouse": "", "parentId": 26, "birthYear": ""},
+      {"id": 68, "name": "PHẠM THỊ NHUNG", "gen": 5, "spouse": "", "parentId": 26, "birthYear": ""},
+      {"id": 69, "name": "PHẠM VĂN TRƯỜNG", "gen": 5, "spouse": "", "parentId": 26, "birthYear": ""},
+      {"id": 70, "name": "PHẠM THỊ ĐÀO", "gen": 5, "spouse": "", "parentId": 26, "birthYear": ""},
+      {"id": 71, "name": "PHẠM VĂN TOÀN", "gen": 5, "spouse": "PHẠM HẰNG", "parentId": 26, "birthYear": ""},
+      {"id": 72, "name": "PHẠM VĂN HUẤN", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 73, "name": "PHẠM THỊ THOA", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 74, "name": "PHẠM THỊ THÊU", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 75, "name": "PHẠM VĂN BÚT", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 76, "name": "PHẠM THỊ GẤM", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 77, "name": "PHẠM THỊ THỦY", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 78, "name": "PHẠM VĂN NGHIÊM", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 79, "name": "PHẠM THỊ THU", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 80, "name": "PHẠM THỊ ĐÔNG", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 81, "name": "PHẠM VĂN NGHI", "gen": 5, "spouse": "", "parentId": 30, "birthYear": ""},
+      {"id": 82, "name": "PHẠM VĂN ĐÌNH", "gen": 5, "spouse": "", "parentId": 34, "birthYear": ""},
+      {"id": 83, "name": "PHẠM VĂN QUỲNH", "gen": 5, "spouse": "", "parentId": 34, "birthYear": ""},
+      {"id": 84, "name": "PHẠM THỊ LIN", "gen": 5, "spouse": "", "parentId": 34, "birthYear": ""},
+      {"id": 85, "name": "PHẠM THỊ LEN", "gen": 5, "spouse": "", "parentId": 34, "birthYear": ""},
+      {"id": 86, "name": "PHẠM THỊ LOAN", "gen": 5, "spouse": "", "parentId": 34, "birthYear": ""},
+      {"id": 87, "name": "PHẠM THỊ LIỄU", "gen": 5, "spouse": "", "parentId": 34, "birthYear": ""},
+      {"id": 88, "name": "PHẠM THỊ LUYẾN", "gen": 5, "spouse": "", "parentId": 34, "birthYear": ""},
+      {"id": 89, "name": "PHẠM THỊ LỊU", "gen": 5, "spouse": "", "parentId": 34, "birthYear": ""},
+      {"id": 90, "name": "PHẠM THỊ PHẤN", "gen": 5, "spouse": "", "parentId": 34, "birthYear": ""},
+      {"id": 91, "name": "PHẠM VĂN ĐỊNH", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 92, "name": "PHẠM VĂN TRÌNH", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 93, "name": "PHẠM THỊ LUYẾN", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 94, "name": "PHẠM THỊ THANH", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 95, "name": "PHẠM VĂN NHÂN", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 96, "name": "PHẠM THỊ KHUYÊN", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 97, "name": "PHẠM THỊ NHẪN", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 98, "name": "PHẠM VĂN KHƯƠNG", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 99, "name": "PHẠM THỊ MẾN", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 100, "name": "PHẠM VĂN SÁNG", "gen": 5, "spouse": "", "parentId": 35, "birthYear": ""},
+      {"id": 101, "name": "PHẠM THỊ RỊU", "gen": 5, "spouse": "", "parentId": 39, "birthYear": ""},
+      {"id": 102, "name": "PHẠM THỊ RÁY", "gen": 5, "spouse": "", "parentId": 39, "birthYear": ""},
+      {"id": 103, "name": "PHẠM THỊ TUYẾT", "gen": 5, "spouse": "", "parentId": 39, "birthYear": ""},
+      {"id": 104, "name": "PHẠM THỊ RƯƠNG", "gen": 5, "spouse": "", "parentId": 39, "birthYear": ""},
+      {"id": 105, "name": "PHẠM THỊ RINH", "gen": 5, "spouse": "", "parentId": 39, "birthYear": ""},
+      {"id": 106, "name": "PHẠM VĂN ĐỒNG", "gen": 5, "spouse": "", "parentId": 39, "birthYear": ""},
+      {"id": 107, "name": "PHẠM THỊ TRINH", "gen": 5, "spouse": "", "parentId": 39, "birthYear": ""},
+      {"id": 108, "name": "PHẠM VĂN HÀN", "gen": 5, "spouse": "", "parentId": 39, "birthYear": ""},
+      {"id": 109, "name": "PHẠM VĂN LUẬN", "gen": 5, "spouse": "", "parentId": 44, "birthYear": ""},
+      {"id": 110, "name": "PHẠM THỊ PHƯỢNG", "gen": 5, "spouse": "", "parentId": 44, "birthYear": ""},
+      {"id": 111, "name": "PHẠM THỊ NGÂN", "gen": 5, "spouse": "", "parentId": 44, "birthYear": ""},
+      {"id": 112, "name": "PHẠM THỊ THUẬN", "gen": 5, "spouse": "", "parentId": 44, "birthYear": ""},
+      {"id": 113, "name": "PHẠM THỊ THẢO", "gen": 5, "spouse": "", "parentId": 44, "birthYear": ""},
+      {"id": 114, "name": "PHẠM VĂN HIỆP", "gen": 5, "spouse": "", "parentId": 45, "birthYear": ""},
+      {"id": 115, "name": "PHẠM VĂN HIẾU", "gen": 5, "spouse": "", "parentId": 45, "birthYear": ""},
+      {"id": 116, "name": "PHẠM VĂN HẬU", "gen": 5, "spouse": "", "parentId": 45, "birthYear": ""},
+      {"id": 117, "name": "PHẠM THỊ THU", "gen": 5, "spouse": "", "parentId": 45, "birthYear": ""},
+      {"id": 118, "name": "PHẠM VĂN CÔNG", "gen": 5, "spouse": "", "parentId": 46, "birthYear": ""},
+      {"id": 119, "name": "PHẠM VĂN ĐÍNH", "gen": 5, "spouse": "", "parentId": 46, "birthYear": ""},
+      {"id": 120, "name": "PHẠM VĂN HƯỚNG", "gen": 5, "spouse": "", "parentId": 46, "birthYear": ""},
+      {"id": 121, "name": "PHẠM THỊ NHÀI", "gen": 5, "spouse": "", "parentId": 46, "birthYear": ""},
+      {"id": 122, "name": "PHẠM THỊ NHUNG", "gen": 5, "spouse": "", "parentId": 46, "birthYear": ""},
+      {"id": 123, "name": "PHẠM VĂN DŨNG (1969)", "gen": 6, "spouse": "HOÀNG THỊ HẢO (1973)", "parentId": 48, "birthYear": "1969"},
+      {"id": 124, "name": "PHẠM VĂN DƯƠNG", "gen": 6, "spouse": "NGUYỄN THỊ OANH", "parentId": 48, "birthYear": ""},
+      {"id": 125, "name": "PHẠM VĂN ĐĂNG", "gen": 6, "spouse": "NGUYỄN THỊ HOA", "parentId": 48, "birthYear": ""},
+      {"id": 126, "name": "PHẠM VĂN RƯ", "gen": 6, "spouse": "DUYÊN", "parentId": 56, "birthYear": ""},
+      {"id": 127, "name": "PHẠM VĂN RẬT", "gen": 6, "spouse": "", "parentId": 56, "birthYear": ""},
+      {"id": 128, "name": "PHẠM VĂN SƠN (1990)", "gen": 6, "spouse": "HƯƠNG (1988)", "parentId": 58, "birthYear": "1990"},
+      {"id": 129, "name": "PHẠM TRỌNG HIỆP", "gen": 6, "spouse": "", "parentId": 58, "birthYear": ""},
+      {"id": 130, "name": "PHẠM THỊ KHUY", "gen": 6, "spouse": "", "parentId": 59, "birthYear": ""},
+      {"id": 131, "name": "PHẠM VĂN HÀ", "gen": 6, "spouse": "", "parentId": 59, "birthYear": ""},
+      {"id": 132, "name": "PHẠM VĂN HUYẾN", "gen": 6, "spouse": "", "parentId": 59, "birthYear": ""},
+      {"id": 133, "name": "PHẠM NGỌC THAO (1993)", "gen": 6, "spouse": "", "parentId": 65, "birthYear": "1993"},
+      {"id": 134, "name": "PHẠM NGỌC THỂ (1995)", "gen": 6, "spouse": "", "parentId": 65, "birthYear": "1995"},
+      {"id": 135, "name": "PHẠM THỊ LINH", "gen": 6, "spouse": "", "parentId": 71, "birthYear": ""},
+      {"id": 136, "name": "PHẠM VĂN PHI", "gen": 6, "spouse": "", "parentId": 71, "birthYear": ""},
+      {"id": 137, "name": "PHẠM VĂN VĂN", "gen": 6, "spouse": "", "parentId": 75, "birthYear": ""},
+      {"id": 138, "name": "PHẠM THỊ HƯỜNG", "gen": 6, "spouse": "", "parentId": 75, "birthYear": ""},
+      {"id": 139, "name": "PHẠM VĂN TÍNH", "gen": 6, "spouse": "", "parentId": 75, "birthYear": ""},
+      {"id": 140, "name": "PHẠM VĂN TOÁN", "gen": 6, "spouse": "", "parentId": 75, "birthYear": ""},
+      {"id": 141, "name": "PHẠM THỊ LEN", "gen": 6, "spouse": "", "parentId": 78, "birthYear": ""},
+      {"id": 142, "name": "PHẠM VĂN LIỆU", "gen": 6, "spouse": "", "parentId": 78, "birthYear": ""},
+      {"id": 143, "name": "PHẠM VĂN SƠN", "gen": 6, "spouse": "", "parentId": 82, "birthYear": ""},
+      {"id": 144, "name": "PHẠM THỊ", "gen": 6, "spouse": "", "parentId": 82, "birthYear": ""},
+      {"id": 145, "name": "PHẠM VĂN SĨ", "gen": 6, "spouse": "", "parentId": 83, "birthYear": ""},
+      {"id": 146, "name": "PHẠM THỊ LUYỆN", "gen": 6, "spouse": "", "parentId": 84, "birthYear": ""},
+      {"id": 147, "name": "PHẠM THỊ KHÁNH", "gen": 6, "spouse": "", "parentId": 84, "birthYear": ""},
+      {"id": 148, "name": "PHẠM THỊ HƯNG", "gen": 6, "spouse": "", "parentId": 84, "birthYear": ""},
+      {"id": 149, "name": "PHẠM VĂN VI", "gen": 6, "spouse": "", "parentId": 91, "birthYear": ""},
+      {"id": 150, "name": "PHẠM VĂN KẾT", "gen": 6, "spouse": "", "parentId": 91, "birthYear": ""},
+      {"id": 151, "name": "PHẠM THỊ NHI", "gen": 6, "spouse": "", "parentId": 92, "birthYear": ""},
+      {"id": 152, "name": "PHẠM VĂN CỦA", "gen": 6, "spouse": "", "parentId": 92, "birthYear": ""},
+      {"id": 153, "name": "PHẠM VĂN PHƯƠNG", "gen": 6, "spouse": "", "parentId": 95, "birthYear": ""},
+      {"id": 154, "name": "PHẠM THỊ THẢO", "gen": 6, "spouse": "", "parentId": 95, "birthYear": ""},
+      {"id": 155, "name": "PHẠM THỊ DƯƠNG", "gen": 6, "spouse": "", "parentId": 95, "birthYear": ""},
+      {"id": 156, "name": "PHẠM VĂN BẢO", "gen": 6, "spouse": "", "parentId": 100, "birthYear": ""},
+      {"id": 157, "name": "PHẠM THỊ DIỄM", "gen": 6, "spouse": "", "parentId": 100, "birthYear": ""},
+      {"id": 158, "name": "PHẠM VĂN ĐẠT", "gen": 6, "spouse": "", "parentId": 106, "birthYear": ""},
+      {"id": 159, "name": "PHẠM MINH THƯ", "gen": 6, "spouse": "", "parentId": 106, "birthYear": ""},
+      {"id": 160, "name": "PHẠM ANH THƯ", "gen": 6, "spouse": "", "parentId": 106, "birthYear": ""},
+      {"id": 161, "name": "PHẠM VĂN ANH", "gen": 6, "spouse": "", "parentId": 108, "birthYear": ""},
+      {"id": 162, "name": "PHẠM VĂN KIÊN", "gen": 6, "spouse": "", "parentId": 108, "birthYear": ""},
+      {"id": 163, "name": "PHẠM VĂN ANH", "gen": 6, "spouse": "", "parentId": 109, "birthYear": ""},
+      {"id": 164, "name": "PHẠM THỊ LINH", "gen": 6, "spouse": "", "parentId": 109, "birthYear": ""},
+      {"id": 165, "name": "PHẠM THỊ CHI", "gen": 6, "spouse": "", "parentId": 109, "birthYear": ""},
+      {"id": 166, "name": "PHẠM VĂN PHÚ", "gen": 6, "spouse": "", "parentId": 114, "birthYear": ""},
+      {"id": 167, "name": "PHẠM THỊ TOAN", "gen": 6, "spouse": "", "parentId": 114, "birthYear": ""},
+      {"id": 168, "name": "PHẠM THỊ NGỌC", "gen": 6, "spouse": "", "parentId": 115, "birthYear": ""},
+      {"id": 169, "name": "PHẠM THỊ ANH", "gen": 6, "spouse": "", "parentId": 115, "birthYear": ""},
+      {"id": 170, "name": "PHẠM VĂN QUÂN", "gen": 6, "spouse": "", "parentId": 116, "birthYear": ""},
+      {"id": 171, "name": "PHẠM VĂN ĐẠT", "gen": 6, "spouse": "", "parentId": 116, "birthYear": ""},
+      {"id": 172, "name": "PHẠM VĂN HOÀNG", "gen": 6, "spouse": "", "parentId": 118, "birthYear": ""},
+      {"id": 173, "name": "PHẠM VĂN PHONG", "gen": 6, "spouse": "", "parentId": 118, "birthYear": ""},
+      {"id": 174, "name": "PHẠM VĂN VINH", "gen": 6, "spouse": "", "parentId": 119, "birthYear": ""},
+      {"id": 175, "name": "PHẠM THỊ HUẾ (1992)", "gen": 7, "spouse": "NGUYỄN ĐỨC HẢI (1986)", "parentId": 123, "birthYear": "1992"},
+      {"id": 176, "name": "PHẠM THỊ QUẾ (1994)", "gen": 7, "spouse": "TRẦN VĂN TẤN (1990)", "parentId": 123, "birthYear": "1994"},
+      {"id": 177, "name": "PHẠM ĐÌNH THIÊM (1999)", "gen": 7, "spouse": "", "parentId": 123, "birthYear": "1999"},
+      {"id": 178, "name": "PHẠM THỊ ÁNH (1998)", "gen": 7, "spouse": "CAO QUANG HƯỚNG (1993)", "parentId": 124, "birthYear": "1998"},
+      {"id": 179, "name": "PHẠM ĐÌNH TUYÊN (2004)", "gen": 7, "spouse": "", "parentId": 124, "birthYear": "2004"},
+      {"id": 180, "name": "PHẠM VĂN DANH (2004)", "gen": 7, "spouse": "", "parentId": 125, "birthYear": "2004"},
+      {"id": 181, "name": "PHẠM LINH ĐAN (2011)", "gen": 7, "spouse": "", "parentId": 125, "birthYear": "2011"},
+      {"id": 182, "name": "PHẠM VĂN HUY", "gen": 7, "spouse": "", "parentId": 126, "birthYear": ""},
+      {"id": 183, "name": "PHẠM VĂN NAM", "gen": 7, "spouse": "", "parentId": 126, "birthYear": ""},
+      {"id": 184, "name": "PHẠM THỊ CHÂU", "gen": 7, "spouse": "", "parentId": 127, "birthYear": ""},
+      {"id": 185, "name": "PHẠM THỊ TRÂM", "gen": 7, "spouse": "", "parentId": 129, "birthYear": ""},
+      {"id": 186, "name": "PHẠM THỊ VY", "gen": 7, "spouse": "", "parentId": 129, "birthYear": ""},
+      {"id": 187, "name": "PHẠM THỊ ANH", "gen": 7, "spouse": "", "parentId": 137, "birthYear": ""},
+      {"id": 188, "name": "PHẠM THỊ DƯƠNG", "gen": 7, "spouse": "", "parentId": 137, "birthYear": ""},
+      {"id": 189, "name": "PHẠM VĂN HUY", "gen": 7, "spouse": "", "parentId": 137, "birthYear": ""},
+      {"id": 190, "name": "PHẠM VĂN LỘC", "gen": 7, "spouse": "", "parentId": 139, "birthYear": ""},
+      {"id": 191, "name": "PHẠM THỊ THƠ", "gen": 7, "spouse": "", "parentId": 149, "birthYear": ""},
+      {"id": 192, "name": "PHẠM VĂN HUY", "gen": 7, "spouse": "", "parentId": 150, "birthYear": ""},
+      {"id": 193, "name": "PHẠM THỊ MINH", "gen": 7, "spouse": "", "parentId": 150, "birthYear": ""}
     ];
+
+    document.getElementById('subTitleCount').innerText = `Tiền Phong Thượng Thôn (${rawData.length} thành viên qua 7 đời)`;
 
     // Tạo bản đồ dữ liệu và con cái
     const memberMap = {};
@@ -588,12 +597,23 @@
       }
     });
 
-    // Đệ quy dựng Sơ Đồ Cây (Hiển thị rõ "Vợ:" hoặc "Chồng:")
+    // Lấy thông tin Bố & Mẹ sinh thành
+    function getParentInfo(m) {
+      if (!m.parentId || !memberMap[m.parentId]) return "Chưa ghi nhận / Bậc Khởi Tổ";
+      const p = memberMap[m.parentId];
+      let res = p.name;
+      if (p.spouse && p.spouse.trim() !== '') {
+        res += ` & ${p.spouse}`;
+      }
+      return res;
+    }
+
+    // Đệ quy dựng Sơ Đồ Cây (Chỉ hiển thị vợ/chồng nếu có thông tin)
     function renderTreeHTML(node) {
       const childCount = node.children.length;
       const countLabel = childCount > 0 ? `${childCount} người con` : "0";
       const sLabel = getSpouseLabel(node.name);
-      const spouseHtml = node.spouse ? `<div class="spouse-name">${sLabel}: ${node.spouse}</div>` : '';
+      const spouseHtml = (node.spouse && node.spouse.trim() !== '') ? `<div class="spouse-name">${sLabel}: ${node.spouse}</div>` : '';
 
       let html = `
         <li>
@@ -618,7 +638,7 @@
 
     document.getElementById('treeRootContainer').innerHTML = `<ul>${renderTreeHTML(memberMap[1])}</ul>`;
 
-    // Render Chế độ Danh Sách Các Đời (Hiển thị rõ "Vợ:" hoặc "Chồng:")
+    // Render Chế độ Danh Sách Các Đời
     function renderListMode() {
       const container = document.getElementById('listMode');
       let html = '';
@@ -634,11 +654,13 @@
             <div class="gen-member-grid">
               ${groupMembers.map(m => {
                 const sLabel = getSpouseLabel(m.name);
+                const hasSpouse = m.spouse && m.spouse.trim() !== '';
                 return `
                 <div class="list-card" onclick="selectMember(${m.id})">
-                  <div class="list-card-name">${m.name}</div>${m.spouse ? `<div class="list-card-spouse">${sLabel}: ${m.spouse}</div>` : ''}
+                  <div class="list-card-name">${m.name}</div>
+                  ${hasSpouse ? `<div class="list-card-spouse">${sLabel}: ${m.spouse}</div>` : ''}
                   <div class="list-card-badge">${memberMap[m.id].children.length} người con</div>
-                  ${m.deathDay ? `<div style="font-size:11px; color:#c53030; margin-top:4px;">Giỗ: ${m.deathText}</div>` : ''}
+                  ${m.birthYear ? `<div style="font-size:11px; color:#2b6cb0; margin-top:4px;">Năm sinh: ${m.birthYear}</div>` : ''}
                 </div>
               `;}).join('')}
             </div>
@@ -773,7 +795,7 @@
     }
 
     /* ========================================================================= */
-    /* HỆ THỐNG PAN & ZOOM MƯỢT MÀ TẠI ĐIỂM CHẠM CẢM ỨNG (TOUCH FOCAL ZOOM)      */
+    /* HỆ THỐNG PAN & ZOOM MƯỢT MÀ TẠI ĐIỂM CHẠM CẢM ỨNG                         */
     /* ========================================================================= */
     const canvas = document.getElementById('treeCanvas');
     const container = document.getElementById('panContainer');
@@ -781,7 +803,6 @@
     let pointX = 0, pointY = 0;
     let isPanning = false;
     let startX = 0, startY = 0;
-
     let prevTouchDist = null;
     let prevTouchMidX = 0, prevTouchMidY = 0;
 
@@ -789,7 +810,6 @@
       container.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
     }
 
-    // Chuột kéo (Mouse Pan)
     canvas.addEventListener('mousedown', (e) => {
       if (e.target.closest('.member-card') || e.target.closest('.zoom-controls')) return;
       isPanning = true;
@@ -804,7 +824,6 @@
     });
     window.addEventListener('mouseup', () => { isPanning = false; });
 
-    // Cuộn chuột phóng to/thu nhỏ tại con trỏ chuột
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       const rect = canvas.getBoundingClientRect();
@@ -818,7 +837,6 @@
       applyTransform();
     }, { passive: false });
 
-    // CẢM ỨNG ĐIỆN THOẠI: 1 NGÓN VUỐT PAN, 2 NGÓN CHỤM/MỞ ZOOM MƯỢT MÀ TẠI TÂM CHẠM
     canvas.addEventListener('touchstart', (e) => {
       if (e.touches.length === 1) {
         if (e.target.closest('.member-card') || e.target.closest('.zoom-controls')) return;
@@ -882,7 +900,6 @@
       applyTransform();
     }
 
-    // Tính tọa độ tĩnh của ô thành viên so với panContainer (không bị ảnh hưởng bởi zoom)
     function getCardStaticOffset(card) {
       let x = 0, y = 0;
       let curr = card;
@@ -908,7 +925,7 @@
     }
 
     /* ========================================================================= */
-    /* TÌM KIẾM HỖ TRỢ GÕ KHÔNG DẤU VÀ TRỎ CHUẨN XÁC ĐẾN THÀNH VIÊN TRÊN CÂY     */
+    /* TÌM KIẾM VÀ ĐIỀU HƯỚNG THÀNH VIÊN                                         */
     /* ========================================================================= */
     function removeVietnameseTones(str) {
       if (!str) return '';
@@ -945,11 +962,12 @@
 
       resContainer.innerHTML = filtered.map(m => {
         const sLabel = getSpouseLabel(m.name);
+        const hasSpouse = m.spouse && m.spouse.trim() !== '';
         return `
         <div class="result-item" onclick="selectSearchResult(${m.id})">
           <div>
             <div class="r-name">${m.name}</div>
-            <div class="r-sub">${m.spouse ? `${sLabel}:${m.spouse}` : `Số con: ${memberMap[m.id].children.length}`}</div>
+            <div class="r-sub">${hasSpouse ? `${sLabel}:${m.spouse}` : `Số con: ${memberMap[m.id].children.length}`}</div>
           </div>
           <span class="r-gen">${romanGens[m.gen]}</span>
         </div>
@@ -963,7 +981,7 @@
       document.getElementById('searchResults').style.display = 'none';
       const inputEl = document.getElementById('searchInput');
       inputEl.value = '';
-      inputEl.blur(); // Tắt bàn phím ảo ngay lập tức
+      inputEl.blur();
 
       isNavigatingToMember = true;
       setTimeout(() => { isNavigatingToMember = false; }, 800);
@@ -971,7 +989,7 @@
       selectMember(id);
     }
 
-    // TRỎ ĐẾN Ô THÀNH VIÊN: GIỮ NGUYÊN MỨC ZOOM HIỆN TẠI (KHÔNG PHÓNG TO THÊM)
+    // XỬ LÝ CHỌN VÀ HIỂN THỊ THÔNG TIN CHI TIẾT
     function selectMember(id, event) {
       if (event) event.stopPropagation();
 
@@ -983,29 +1001,47 @@
       const card = document.getElementById('card-' + id);
       if (!card) return;
 
-      // Đánh dấu nổi bật duy nhất người được chọn
       document.querySelectorAll('.member-card.highlight').forEach(el => el.classList.remove('highlight'));
       card.classList.add('highlight');
 
-      // GIỮ NGUYÊN MỨC ZOOM HIỆN TẠI: Không thay đổi giá trị scale
       const offset = getCardStaticOffset(card);
       const canRect = canvas.getBoundingClientRect();
 
-      // Căn chính diện người đó vào giữa màn hình theo mức zoom hiện có
       pointX = (canRect.width / 2) - (offset.x + card.offsetWidth / 2) * scale;
       pointY = (canRect.height / 2) - (offset.y + card.offsetHeight / 2) * scale;
       applyTransform();
 
-      // Hiển thị thông tin chi tiết (Hiển thị chính xác Vợ: hoặc Chồng:)
+      // Cập nhật thông tin chi tiết vào Modal
       const sLabel = getSpouseLabel(m.name);
       document.getElementById('mName').innerText = m.name;
       document.getElementById('mGen').innerText = romanGens[m.gen];
-      document.getElementById('mSpouseLabel').innerText = `${sLabel}:`;
-      document.getElementById('mSpouse').innerText = m.spouse || 'Chưa ghi nhận';
+
+      // Ẩn/Hiện dòng Vợ hoặc Chồng
+      const spouseRow = document.getElementById('mSpouseRow');
+      if (m.spouse && m.spouse.trim() !== '') {
+        spouseRow.style.display = 'block';
+        document.getElementById('mSpouseLabel').innerText = `${sLabel}:`;
+        document.getElementById('mSpouse').innerText = m.spouse;
+      } else {
+        spouseRow.style.display = 'none';
+      }
+
+      // Năm sinh thay thế dòng ngày giỗ
+      const birthRow = document.getElementById('mBirthRow');
+      if (m.birthYear && m.birthYear.trim() !== '') {
+        birthRow.style.display = 'block';
+        document.getElementById('mBirthYear').innerText = m.birthYear;
+      } else {
+        birthRow.style.display = 'none';
+      }
+
+      // Thông tin Sinh thành (Bố & Mẹ)
+      document.getElementById('mParents').innerText = getParentInfo(m);
+
+      // Số lượng con và Danh sách con
       document.getElementById('mChildren').innerText = m.children.length > 0 ? `${m.children.length} người con` : 'Chưa ghi nhận con';
-      document.getElementById('mDeathAnniv').innerText = m.deathText || 'Chưa ghi nhận';
       const cNames = m.children.map(c => c.name).join(', ');
-      document.getElementById('mChildrenList').innerText = cNames || 'Chưa có thông tin';
+      document.getElementById('mChildrenList').innerText = cNames || 'Chưa ghi nhận con';
       document.getElementById('mNote').innerText = `Thế hệ thứ ${m.gen} trong phả chi`;
 
       setTimeout(() => {
